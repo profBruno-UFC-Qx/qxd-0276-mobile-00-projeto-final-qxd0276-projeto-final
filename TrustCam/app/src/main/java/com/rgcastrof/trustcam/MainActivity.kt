@@ -39,7 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.rgcastrof.trustcam.ui.CameraPreviewScreen
+import com.rgcastrof.trustcam.ui.CameraPreview
 import com.rgcastrof.trustcam.viewmodel.CameraViewModel
 
 class MainActivity : ComponentActivity() {
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                             .background(Color.Black)
                     ) {
                         controller.cameraSelector = uiState.cameraSelector
-                        CameraPreviewScreen(
+                        CameraPreview(
                             controller = controller,
                             modifier = Modifier.fillMaxWidth()
                                 .aspectRatio(9f/16f)

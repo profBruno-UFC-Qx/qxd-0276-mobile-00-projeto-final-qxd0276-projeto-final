@@ -10,7 +10,7 @@ import androidx.camera.view.PreviewView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraPreviewScreen(
+fun CameraPreview(
     controller: LifecycleCameraController,
     modifier: Modifier = Modifier
 ) {
