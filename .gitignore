@@ -1,0 +1,20 @@
+.gitkey
+# --- GERAL DO SISTEMA (Mac/Windows) ---
+.DS_Store
+Thumbs.db
+.idea/
+
+# --- REGRAS DO ANDROID (Apontando para a pasta mobile) ---
+mobile/local.properties
+mobile/.gradle/
+mobile/build/
+mobile/app/build/
+mobile/.cxx/
+mobile/.idea/
+mobile/captures/
+mobile/*.iml
+
+# --- REGRAS DO BACKEND (Para o futuro) ---
+backend/node_modules/
+backend/venv/
+backend/.env

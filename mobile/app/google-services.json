@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "458826823176",
+    "project_id": "pegaai-72fe5",
+    "storage_bucket": "pegaai-72fe5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458826823176:android:94aa7f890763e4d2ecc3bd",
+        "android_client_info": {
+          "package_name": "com.pegai.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4aJSRGgKTuguUB146F1Uud7ruL70Z6iY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
