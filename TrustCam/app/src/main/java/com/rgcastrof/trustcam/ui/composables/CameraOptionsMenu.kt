@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.FlashAuto
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
@@ -70,7 +70,7 @@ fun CameraOptionsMenu(
             }
         }
         Icon(
-            imageVector = if (expanded) Icons.Default.Close else Icons.Default.Dashboard,
+            imageVector = if (expanded) Icons.Default.Close else Icons.Default.Apps,
             contentDescription = "Camera dashboard button",
             modifier = modifier
                 .clickable { expanded = !expanded }
