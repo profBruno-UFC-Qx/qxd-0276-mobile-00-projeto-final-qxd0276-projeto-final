@@ -67,51 +67,65 @@ fun PhotoDetailOverlay(
                 contentDescription = null
             )
         }
+
         Row(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier.fillMaxWidth()
+                .align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .clickable(onClick = {
-                        sharePhoto(
-                            context = context,
-                            filePath = currentPage.filePath
-                        )
-                    })
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Default.Share,
-                    contentDescription = null
-                )
-                Text(
-                    text = "Share",
-                    fontSize = 12.sp,
-                )
+            ButtonWithIconAndLabel(
+                icon = Icons.Default.Share,
+                contentDescription = "Share photo",
+                label = "Share",
+                onClick = {
+                    sharePhoto(
+                        context = context,
+                        filePath = currentPage.filePath
+                    )
+                }
+            )
 
-            }
+            ButtonWithIconAndLabel(
+                icon = Icons.Default.SaveAlt,
+                contentDescription = "Save the photo in the internal storage",
+                label = "Save to gallery",
+                onClick = {},
+            )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .clickable(onClick = {
-                        onDeleteClick(currentPage)
-                    })
-                    .padding(10.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.size(30.dp),
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = null
-                )
-                Text(
-                    text = "Delete",
-                    fontSize = 12.sp,
-                )
-            }
+            ButtonWithIconAndLabel(
+                icon = Icons.Default.DeleteOutline,
+                contentDescription = "Delete the photo",
+                label = "Delete",
+                onClick = {
+                    onDeleteClick(currentPage)
+                }
+            )
         }
+    }
+}
+
+@Composable
+fun ButtonWithIconAndLabel(
+    icon: ImageVector,
+    contentDescription: String,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(10.dp)
+    ) {
+        Icon(
+            modifier = Modifier.size(30.dp),
+            imageVector = icon,
+            contentDescription = contentDescription
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp,
+        )
     }
 }
 
