@@ -3,6 +3,7 @@ package com.rgcastrof.trustcam.ui.screens
 import android.content.Context
 import android.media.MediaActionSound
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.aspectRatio
@@ -135,23 +136,27 @@ private fun takePhoto(
     onPhotoCaptured: (String) -> Unit
 ) {
     MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
-    val photosDir = File(context.filesDir, "my_images")
-    if (!photosDir.exists()) photosDir.mkdirs()
-    val photoFile = File(
-        photosDir,
-        "trustcam_${System.currentTimeMillis()}.jpg"
-    )
+
+    val photosDir = File(context.filesDir, "photos").apply {
+        if (!exists()) mkdirs()
+    }
+
+    val photoFile = File(photosDir, "trustcam_${System.currentTimeMillis()}.jpg")
+
     val outputFileOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
     controller.takePicture(
         outputFileOptions,
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onError(exception: ImageCaptureException) {
+                Toast.makeText(context, "Failed to take photo", Toast.LENGTH_SHORT)
+                    .show()
                 Log.e("Camera", "Couldn't take photo: ", exception)
             }
 
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                 onPhotoCaptured(photoFile.absolutePath)
+                Log.d("Camera", "Photo saved at: ${photoFile.absolutePath}")
             }
         }
     )
