@@ -3,45 +3,39 @@ package com.example.ecotracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ecotracker.data.local.database.DatabaseProvider
+import com.example.ecotracker.data.repository.HabitRepository
+import com.example.ecotracker.ui.addHabit.HabitViewModel
+import com.example.ecotracker.ui.habits.HabitViewModelFactory
+import com.example.ecotracker.ui.habits.AddHabitScreen
 import com.example.ecotracker.ui.theme.EcoTrackerTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // 1️⃣ Cria o banco
+        val database = DatabaseProvider.getDatabase(this)
+
+        // 2️⃣ Obtém o DAO
+        val habitDao = database.habitDao()
+
+        // 3️⃣ Cria o Repository
+        val habitRepository = HabitRepository(habitDao)
+
         setContent {
             EcoTrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+
+                // 4️⃣ Cria o ViewModel com Factory
+                val viewModel: HabitViewModel = viewModel(
+                    factory = HabitViewModelFactory(habitRepository)
+                )
+
+                // 5️⃣ Chama a tela
+                AddHabitScreen(viewModel = viewModel)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EcoTrackerTheme {
-        Greeting("Android")
     }
 }
