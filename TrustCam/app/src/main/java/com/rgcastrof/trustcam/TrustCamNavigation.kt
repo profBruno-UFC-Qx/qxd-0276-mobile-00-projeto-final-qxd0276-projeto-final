@@ -16,12 +16,10 @@ import com.rgcastrof.trustcam.ui.screens.CameraScreen
 import com.rgcastrof.trustcam.ui.screens.GalleryScreen
 import com.rgcastrof.trustcam.ui.screens.PhotoDetailScreen
 import com.rgcastrof.trustcam.viewmodel.CameraViewModel
-import com.rgcastrof.trustcam.viewmodel.GalleryViewModel
 import com.rgcastrof.trustcam.viewmodel.PhotoDetailViewModel
 
 sealed class Screen(val route: String) {
     object CameraScreen : Screen("camera_screen")
-    object GalleryScreen : Screen("gallery_screen")
     object PhotoDetailScreen : Screen(route = "photo_detail_screen/{photoId}") {
         fun createRoute(photoId: Int) = "photo_detail_screen/$photoId"
     }
@@ -40,24 +38,14 @@ fun TrustCamNavigation(context: Context) {
                 onSwitchCamera = viewModel::switchCamera,
                 storePhotoInDevice = viewModel::storePhotoInDevice,
                 onNavigateToGallery = {
-                    navController.navigate(route = Screen.GalleryScreen.route)
+                    navController.navigate(route = Screen.PhotoDetailScreen.createRoute(photoId))
                 },
                 context = context,
                 onToggleFlashMode = viewModel::toggleFlash,
                 onToggleGridState = viewModel::toggleGridState
             )
         }
-        composable(route = Screen.GalleryScreen.route) {
-            val viewModel: GalleryViewModel = viewModel(factory = GalleryViewModel.Factory)
-            val uiState by viewModel.uiState.collectAsState()
-            GalleryScreen(
-                photos = uiState.photos,
-                modifier = Modifier.fillMaxSize(),
-                onPhotoClick = { photoId ->
-                    navController.navigate(Screen.PhotoDetailScreen.createRoute(photoId))
-                }
-            )
-        }
+
         composable(
             route = Screen.PhotoDetailScreen.route,
             arguments = listOf(
