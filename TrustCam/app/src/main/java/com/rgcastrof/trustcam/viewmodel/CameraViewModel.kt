@@ -1,5 +1,6 @@
 package com.rgcastrof.trustcam.viewmodel
 
+import android.graphics.Bitmap
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.lifecycle.ViewModel
@@ -49,14 +50,16 @@ class CameraViewModel(
         _uiState.update { it.copy(gridStateOn = !currentGridState) }
     }
 
-    fun storePhotoInDevice(photoUriString: String) {
-        if (photoUriString.isBlank()) return
+    fun storePhotoInDevice(bitmap: Bitmap) {
         viewModelScope.launch {
-            val photo = Photo(
-                filePath = photoUriString,
-                timestamp = System.currentTimeMillis()
-            )
-            cameraRepository.insert(photo)
+            val savedUri = cameraRepository.saveBitmapToMediaStore(bitmap)
+            if (savedUri != null) {
+                val photo = Photo(
+                    filePath = savedUri.toString(),
+                    timestamp = System.currentTimeMillis()
+                )
+                cameraRepository.insert(photo)
+            }
         }
     }
 

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +39,6 @@ fun PhotoDetailOverlay(
     currentPage: Photo,
     dateFormat: String,
     onBackClick: () -> Unit,
-    onSaveToGallery: (Photo) -> Unit,
     onDeleteClick: (Photo) -> Unit,
 ) {
     Box(
@@ -84,15 +82,6 @@ fun PhotoDetailOverlay(
                         filePath = currentPage.filePath
                     )
                 }
-            )
-
-            ButtonWithIconAndLabel(
-                icon = Icons.Default.SaveAlt,
-                contentDescription = "Save the photo in the internal storage",
-                label = "Export",
-                onClick = {
-                    onSaveToGallery(currentPage)
-                },
             )
 
             ButtonWithIconAndLabel(

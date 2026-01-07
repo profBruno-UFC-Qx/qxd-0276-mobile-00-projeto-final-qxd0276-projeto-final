@@ -38,7 +38,7 @@ fun TrustCamNavigation(context: Context) {
             CameraScreen(
                 uiState = uiState,
                 onSwitchCamera = viewModel::switchCamera,
-                onPhotoSaved = viewModel::storePhotoInDevice,
+                storePhotoInDevice = viewModel::storePhotoInDevice,
                 onNavigateToGallery = {
                     navController.navigate(route = Screen.GalleryScreen.route)
                 },
@@ -72,7 +72,6 @@ fun TrustCamNavigation(context: Context) {
                 showOverlay = uiState.detailOverlay,
                 initialPhotoId = uiState.selectedPhotoId,
                 onBackClick = { navController.popBackStack() },
-                onExportClick = viewModel::exportPhoto,
                 onDeleteClick = viewModel::deletePhoto,
                 onImageClick = viewModel::toggleDetailOverlay
             )
