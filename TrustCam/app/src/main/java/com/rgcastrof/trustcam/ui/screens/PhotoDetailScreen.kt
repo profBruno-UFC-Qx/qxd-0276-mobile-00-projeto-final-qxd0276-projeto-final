@@ -30,6 +30,7 @@ fun PhotoDetailScreen(
     initialPhotoId: Int?,
     onBackClick: () -> Unit,
     onImageClick: () -> Unit,
+    onExportClick: (photo: Photo) -> Unit,
     onDeleteClick: (photo: Photo) -> Unit,
 ) {
     when {
@@ -85,7 +86,8 @@ fun PhotoDetailScreen(
                         currentPage = currentPage,
                         dateFormat = dateFormat,
                         onBackClick = onBackClick,
-                        onDeleteClick = onDeleteClick
+                        onSaveToGallery = onExportClick,
+                        onDeleteClick = onDeleteClick,
                     )
                 }
             }

@@ -40,6 +40,7 @@ fun PhotoDetailOverlay(
     currentPage: Photo,
     dateFormat: String,
     onBackClick: () -> Unit,
+    onSaveToGallery: (Photo) -> Unit,
     onDeleteClick: (Photo) -> Unit,
 ) {
     Box(
@@ -88,8 +89,10 @@ fun PhotoDetailOverlay(
             ButtonWithIconAndLabel(
                 icon = Icons.Default.SaveAlt,
                 contentDescription = "Save the photo in the internal storage",
-                label = "Save to gallery",
-                onClick = {},
+                label = "Export",
+                onClick = {
+                    onSaveToGallery(currentPage)
+                },
             )
 
             ButtonWithIconAndLabel(
