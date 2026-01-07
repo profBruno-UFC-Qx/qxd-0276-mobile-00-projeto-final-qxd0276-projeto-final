@@ -56,6 +56,12 @@ class PhotoDetailViewModel(
         }
     }
 
+    fun exportPhoto(photo: Photo) {
+        viewModelScope.launch {
+            cameraRepository.exportToGallery(photo)
+        }
+    }
+
     fun deletePhoto(photo: Photo) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
