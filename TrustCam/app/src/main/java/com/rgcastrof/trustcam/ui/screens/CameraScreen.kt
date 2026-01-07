@@ -1,9 +1,10 @@
 package com.rgcastrof.trustcam.ui.screens
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.media.MediaActionSound
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,28 +17,36 @@ import androidx.compose.ui.Modifier
 import com.rgcastrof.trustcam.ui.composables.CameraPreview
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
 import com.rgcastrof.trustcam.ui.composables.CameraControls
 import com.rgcastrof.trustcam.ui.composables.CameraOptionsMenu
 import com.rgcastrof.trustcam.uistate.CameraUiState
-import java.io.File
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun CameraScreen(
     uiState: CameraUiState,
-    onPhotoSaved: (String) -> Unit,
     onSwitchCamera: () -> Unit,
     onNavigateToGallery: () -> Unit,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
+    storePhotoInDevice: (Bitmap) -> Unit,
     context: Context
 ) {
+    val mediaActionSound = remember { MediaActionSound() }
+
+    DisposableEffect(Unit) {
+        mediaActionSound.load(MediaActionSound.SHUTTER_CLICK)
+        onDispose { mediaActionSound.release() }
+    }
+
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
@@ -81,12 +90,11 @@ fun CameraScreen(
                 onNavigateToGallery()
             },
             onTakePhoto = {
+                mediaActionSound.play(MediaActionSound.SHUTTER_CLICK)
                 takePhoto(
                     context = context,
                     controller = controller,
-                    onPhotoCaptured = { uriString ->
-                        onPhotoSaved(uriString)
-                    }
+                    onPhotoCaptured = storePhotoInDevice
                 )
             },
             onSwitchCamera = onSwitchCamera,
@@ -97,30 +105,36 @@ fun CameraScreen(
 private fun takePhoto(
     context: Context,
     controller: LifecycleCameraController,
-    onPhotoCaptured: (String) -> Unit
+    onPhotoCaptured: (Bitmap) -> Unit
 ) {
-    MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
-
-    val photosDir = File(context.filesDir, "photos").apply {
-        if (!exists()) mkdirs()
-    }
-
-    val photoFile = File(photosDir, "trustcam_${System.currentTimeMillis()}.jpg")
-
-    val outputFileOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
     controller.takePicture(
-        outputFileOptions,
         ContextCompat.getMainExecutor(context),
-        object : ImageCapture.OnImageSavedCallback {
-            override fun onError(exception: ImageCaptureException) {
-                Toast.makeText(context, "Failed to take photo", Toast.LENGTH_SHORT)
-                    .show()
-                Log.e("Camera", "Couldn't take photo: ", exception)
+        object : ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                super.onCaptureSuccess(image)
+
+                val matrix = Matrix().apply {
+                    postRotate(image.imageInfo.rotationDegrees.toFloat())
+                    postScale(-1f, 1f)
+                }
+
+                val rotatedBitmap = Bitmap.createBitmap(
+                    image.toBitmap(),
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    matrix,
+                    true
+                )
+
+                onPhotoCaptured(rotatedBitmap)
+                image.close()
             }
 
-            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                onPhotoCaptured(photoFile.absolutePath)
-                Log.d("Camera", "Photo saved at: ${photoFile.absolutePath}")
+            override fun onError(exception: ImageCaptureException) {
+                super.onError(exception)
+                Log.e("Camera", "Couldn't take photo: $exception")
             }
         }
     )
