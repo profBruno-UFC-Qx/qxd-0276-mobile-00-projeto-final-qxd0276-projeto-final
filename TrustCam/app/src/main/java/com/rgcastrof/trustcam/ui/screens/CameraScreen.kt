@@ -98,6 +98,7 @@ fun CameraScreen(
                 )
             },
             onSwitchCamera = onSwitchCamera,
+            lastTakenPhoto = uiState.lastTakenPhoto
         )
     }
 }
