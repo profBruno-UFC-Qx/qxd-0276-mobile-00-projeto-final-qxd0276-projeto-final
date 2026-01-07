@@ -25,6 +25,15 @@ class CameraViewModel(
     private val _uiState = MutableStateFlow(CameraUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            cameraRepository.getLastPhoto().collect { photo ->
+                _uiState.update { currentState ->
+                    currentState.copy(lastTakenPhoto = photo)
+                }
+            }
+        }
+    }
     fun switchCamera() {
         val currentSelector = _uiState.value.cameraSelector
         val nextSelector = if (currentSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
