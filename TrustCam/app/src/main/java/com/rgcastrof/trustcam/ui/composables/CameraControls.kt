@@ -33,7 +33,7 @@ fun CameraControls(
     lastTakenPhoto: Photo?
 ) {
     Row(
-        modifier = Modifier .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
