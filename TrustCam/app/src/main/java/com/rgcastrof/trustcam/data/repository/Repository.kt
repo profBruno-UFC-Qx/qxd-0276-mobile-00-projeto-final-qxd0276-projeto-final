@@ -19,6 +19,7 @@ class CameraRepository(
     suspend fun insert(photo: Photo) = dao.insertPhoto(photo)
     suspend fun delete(photo: Photo) = dao.deletePhoto(photo)
     fun getAllPhotos() = dao.getAllPhotos()
+    fun getLastPhoto() = dao.getLastPhoto()
 
     suspend fun saveBitmapToMediaStore(capturedPhotoBitmap: Bitmap): Uri? = withContext(Dispatchers.IO) {
         val timestamp = System.currentTimeMillis()

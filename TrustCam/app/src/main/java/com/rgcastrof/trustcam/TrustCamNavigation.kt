@@ -1,27 +1,20 @@
 package com.rgcastrof.trustcam
 
 import android.content.Context
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.rgcastrof.trustcam.ui.screens.CameraScreen
-import com.rgcastrof.trustcam.ui.screens.GalleryScreen
 import com.rgcastrof.trustcam.ui.screens.PhotoDetailScreen
 import com.rgcastrof.trustcam.viewmodel.CameraViewModel
-import com.rgcastrof.trustcam.viewmodel.GalleryViewModel
 import com.rgcastrof.trustcam.viewmodel.PhotoDetailViewModel
 
 sealed class Screen(val route: String) {
     object CameraScreen : Screen("camera_screen")
-    object GalleryScreen : Screen("gallery_screen")
     object PhotoDetailScreen : Screen(route = "photo_detail_screen/{photoId}") {
         fun createRoute(photoId: Int) = "photo_detail_screen/$photoId"
     }
@@ -40,37 +33,26 @@ fun TrustCamNavigation(context: Context) {
                 onSwitchCamera = viewModel::switchCamera,
                 storePhotoInDevice = viewModel::storePhotoInDevice,
                 onNavigateToGallery = {
-                    navController.navigate(route = Screen.GalleryScreen.route)
+                    uiState.lastTakenPhoto?.let { photo ->
+                        navController.navigate(Screen.PhotoDetailScreen.createRoute(photo.id))
+                    }
                 },
                 context = context,
                 onToggleFlashMode = viewModel::toggleFlash,
                 onToggleGridState = viewModel::toggleGridState
             )
         }
-        composable(route = Screen.GalleryScreen.route) {
-            val viewModel: GalleryViewModel = viewModel(factory = GalleryViewModel.Factory)
-            val uiState by viewModel.uiState.collectAsState()
-            GalleryScreen(
-                photos = uiState.photos,
-                modifier = Modifier.fillMaxSize(),
-                onPhotoClick = { photoId ->
-                    navController.navigate(Screen.PhotoDetailScreen.createRoute(photoId))
-                }
-            )
-        }
+
         composable(
             route = Screen.PhotoDetailScreen.route,
-            arguments = listOf(
-                navArgument("photoId") { type = NavType.IntType }
-            )
         ) {
             val viewModel: PhotoDetailViewModel = viewModel(factory = PhotoDetailViewModel.Factory)
             val uiState by viewModel.uiState.collectAsState()
+
             PhotoDetailScreen(
                 context = context,
-                photos = uiState.photos,
                 showOverlay = uiState.detailOverlay,
-                initialPhotoId = uiState.selectedPhotoId,
+                photos = uiState.photos,
                 onBackClick = { navController.popBackStack() },
                 onDeleteClick = viewModel::deletePhoto,
                 onImageClick = viewModel::toggleDetailOverlay

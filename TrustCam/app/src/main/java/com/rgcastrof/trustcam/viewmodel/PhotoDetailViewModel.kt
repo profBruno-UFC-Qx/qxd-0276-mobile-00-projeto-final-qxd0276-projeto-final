@@ -1,11 +1,9 @@
 package com.rgcastrof.trustcam.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -24,9 +22,7 @@ import java.io.File
 
 class PhotoDetailViewModel(
     private val cameraRepository: CameraRepository,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _selectedPhotoId: Int? = savedStateHandle["photoId"]
     private val _detailOverlay = MutableStateFlow(true)
     private val _allPhotos = cameraRepository.getAllPhotos()
         .stateIn(
@@ -41,7 +37,6 @@ class PhotoDetailViewModel(
     ) { detailOverlay, photos ->
         PhotoDetailUiState(
             photos = photos,
-            selectedPhotoId = _selectedPhotoId,
             detailOverlay = detailOverlay
         )
     }.stateIn(
@@ -78,8 +73,7 @@ class PhotoDetailViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TrustCamApplication)
                 val repository = application.repository
-                val savedStateHandle = createSavedStateHandle()
-                PhotoDetailViewModel(repository, savedStateHandle)
+                PhotoDetailViewModel(repository)
             }
         }
     }
