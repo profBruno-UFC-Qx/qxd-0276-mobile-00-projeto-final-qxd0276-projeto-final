@@ -11,16 +11,24 @@ import com.rgcastrof.trustcam.data.dao.PhotoDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import androidx.core.net.toUri
 
 class CameraRepository(
     private val dao: PhotoDao,
     private val contentResolver: ContentResolver
 ) {
     suspend fun insert(photo: Photo) = dao.insertPhoto(photo)
-    suspend fun delete(photo: Photo) = dao.deletePhoto(photo)
     fun getAllPhotos() = dao.getAllPhotos()
     fun getLastPhoto() = dao.getLastPhoto()
 
+    suspend fun deleteFromRoomAndDevice(photo: Photo) = withContext(Dispatchers.IO) {
+        try {
+            contentResolver.delete(photo.filePath.toUri(), null, null)
+            dao.deletePhoto(photo)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     suspend fun saveBitmapToMediaStore(capturedPhotoBitmap: Bitmap): Uri? = withContext(Dispatchers.IO) {
         val timestamp = System.currentTimeMillis()
         val filename = "trustcam_$timestamp.jpg"

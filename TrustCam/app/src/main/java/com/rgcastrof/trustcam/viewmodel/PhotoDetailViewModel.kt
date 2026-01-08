@@ -11,14 +11,12 @@ import com.rgcastrof.trustcam.data.TrustCamApplication
 import com.rgcastrof.trustcam.data.model.Photo
 import com.rgcastrof.trustcam.data.repository.CameraRepository
 import com.rgcastrof.trustcam.uistate.PhotoDetailUiState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 
 class PhotoDetailViewModel(
     private val cameraRepository: CameraRepository,
@@ -52,18 +50,11 @@ class PhotoDetailViewModel(
     }
 
     fun deletePhoto(photo: Photo) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
-                val file = File(photo.filePath)
-                if (file.exists()) {
-                    val deleted = file.delete()
-                    if (deleted) {
-                        Log.d("PhotoDetail", "Hard file successful deleted")
-                    }
-                }
-                cameraRepository.delete(photo)
+                cameraRepository.deleteFromRoomAndDevice(photo)
             } catch (e: Exception) {
-                Log.e("PhotoDetail", "Failed to delete photo", e)
+                Log.e("PhotoDetail", "Error to delete photo: ${e.message}")
             }
         }
     }
