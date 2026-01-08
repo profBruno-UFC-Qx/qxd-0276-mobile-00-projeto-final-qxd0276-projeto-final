@@ -3,6 +3,7 @@ package com.rgcastrof.trustcam.viewmodel
 import android.graphics.Bitmap
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -57,6 +58,15 @@ class CameraViewModel(
     fun toggleGridState() {
         val currentGridState = _uiState.value.gridStateOn
         _uiState.update { it.copy(gridStateOn = !currentGridState) }
+    }
+
+    fun switchAspectRatio() {
+        val currentAspectRatio = _uiState.value.aspectRatio
+        val nextAspectRatio = if (currentAspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+            AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
+            else
+            AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
+        _uiState.update { it.copy(aspectRatio = nextAspectRatio) }
     }
 
     fun storePhotoInDevice(bitmap: Bitmap) {

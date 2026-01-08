@@ -1,6 +1,7 @@
 package com.rgcastrof.trustcam.ui.composables
 
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,14 +34,16 @@ fun CameraOptionsMenu(
     uiState: CameraUiState,
     modifier: Modifier = Modifier,
     gridStateOn: Boolean,
+    aspectRatio: AspectRatioStrategy,
     onToggleFlashMode: () -> Unit,
-    onToggleGridState: () -> Unit
+    onToggleGridState: () -> Unit,
+    onToggleAspectRatio: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
-            .padding(12.dp)
-            .background(shape = CircleShape, color = Color.Black.copy(alpha = 0.5f)).padding(12.dp)
+            .padding(end = 30.dp, bottom = 110.dp)
+            .background(shape = CircleShape, color = Color.Black.copy(alpha = 0.5f)).padding(10.dp)
     ) {
         AnimatedVisibility(
             visible = expanded
@@ -52,10 +55,14 @@ fun CameraOptionsMenu(
                     contentDescription = "Camera grid button",
                     onClick = onToggleGridState
                 )
-                /* TODO: Implement aspect ratio */
                 Text(
-                    text = "9:16",
-                    modifier = Modifier.padding(end = 22.dp)
+                    text = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                        "16:9"
+                        else
+                        "4:3",
+                    modifier = Modifier
+                        .padding(end = 22.dp)
+                        .clickable { onToggleAspectRatio() },
                 )
                 MenuItem(
                     modifier = modifier.padding(end = 10.dp),

@@ -1,6 +1,8 @@
 package com.rgcastrof.trustcam.ui.composables
 
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,8 +11,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CameraGridOverlay(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier.fillMaxSize()) {
+fun CameraGridOverlay(
+    modifier: Modifier = Modifier,
+    aspectRatio: AspectRatioStrategy
+) {
+    val currentRatio = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+        (9f/16f)
+    else
+        (3f/4f)
+
+    Canvas(modifier = modifier.fillMaxSize().aspectRatio(currentRatio)) {
         val width = size.width
         val height = size.height
         val strokeWidth = 1.dp.toPx()

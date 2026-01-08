@@ -27,13 +27,14 @@ import com.rgcastrof.trustcam.data.model.Photo
 
 @Composable
 fun CameraControls(
+    modifier: Modifier,
     onOpenGallery: () -> Unit,
     onTakePhoto: () -> Unit,
     onSwitchCamera: () -> Unit,
     lastTakenPhoto: Photo?
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {

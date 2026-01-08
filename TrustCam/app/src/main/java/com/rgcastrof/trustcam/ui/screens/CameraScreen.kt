@@ -7,9 +7,7 @@ import android.media.MediaActionSound
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,11 +16,12 @@ import com.rgcastrof.trustcam.ui.composables.CameraPreview
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
 import com.rgcastrof.trustcam.ui.composables.CameraControls
@@ -37,6 +36,7 @@ fun CameraScreen(
     onNavigateToGallery: () -> Unit,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
+    onToggleAspectRatio: () -> Unit,
     storePhotoInDevice: (Bitmap) -> Unit,
     context: Context
 ) {
@@ -47,11 +47,16 @@ fun CameraScreen(
         onDispose { mediaActionSound.release() }
     }
 
-    val controller = remember {
+    val controller = remember(uiState.aspectRatio) {
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(uiState.aspectRatio)
+            .build()
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
                 CameraController.IMAGE_CAPTURE
             )
+            previewResolutionSelector = resolutionSelector
+            imageCaptureResolutionSelector = resolutionSelector
         }
     }
 
@@ -63,29 +68,32 @@ fun CameraScreen(
         controller.imageCaptureFlashMode = uiState.flashMode
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
     ) {
-        val cameraPreviewModifier = Modifier.fillMaxWidth().aspectRatio(9f/16)
-        Box(modifier = Modifier.fillMaxWidth()) {
+        key(uiState.aspectRatio) {
             CameraPreview(
-                gridState = uiState.gridStateOn,
                 controller = controller,
-                modifier = cameraPreviewModifier
+                modifier = Modifier.fillMaxSize(),
+                gridState = uiState.gridStateOn,
+                aspectRatio = uiState.aspectRatio,
             )
-            CameraOptionsMenu(
-                uiState = uiState,
-                modifier = Modifier.align(Alignment.BottomEnd),
-                gridStateOn = uiState.gridStateOn,
-                onToggleFlashMode = onToggleFlashMode,
-                onToggleGridState = onToggleGridState
-            )
-
         }
 
+        CameraOptionsMenu(
+            uiState = uiState,
+            modifier = Modifier.align(Alignment.BottomEnd),
+            gridStateOn = uiState.gridStateOn,
+            aspectRatio = uiState.aspectRatio,
+            onToggleFlashMode = onToggleFlashMode,
+            onToggleGridState = onToggleGridState,
+            onToggleAspectRatio = onToggleAspectRatio
+        )
+
         CameraControls(
+            modifier = Modifier.align(Alignment.BottomCenter),
             onOpenGallery = {
                 onNavigateToGallery()
             },
@@ -116,7 +124,6 @@ private fun takePhoto(
 
                 val matrix = Matrix().apply {
                     postRotate(image.imageInfo.rotationDegrees.toFloat())
-                    postScale(-1f, 1f)
                 }
 
                 val rotatedBitmap = Bitmap.createBitmap(
