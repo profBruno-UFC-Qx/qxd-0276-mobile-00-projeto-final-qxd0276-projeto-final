@@ -39,7 +39,8 @@ fun TrustCamNavigation(context: Context) {
                 },
                 context = context,
                 onToggleFlashMode = viewModel::toggleFlash,
-                onToggleGridState = viewModel::toggleGridState
+                onToggleGridState = viewModel::toggleGridState,
+                onToggleAspectRatio = viewModel::switchAspectRatio
             )
         }
 
