@@ -3,12 +3,12 @@ package com.example.ecotracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ecotracker.data.local.database.DatabaseProvider
-import com.example.ecotracker.data.repository.HabitRepository
-import com.example.ecotracker.ui.addHabit.HabitViewModel
-import com.example.ecotracker.ui.habits.HabitViewModelFactory
-import com.example.ecotracker.ui.habits.AddHabitScreen
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.example.ecotracker.ui.navigation.EcoTrackerNavGraph
 import com.example.ecotracker.ui.theme.EcoTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -16,26 +16,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1️⃣ Cria o banco
-        val database = DatabaseProvider.getDatabase(this)
-
-        // 2️⃣ Obtém o DAO
-        val habitDao = database.habitDao()
-
-        // 3️⃣ Cria o Repository
-        val habitRepository = HabitRepository(habitDao)
-
         setContent {
             EcoTrackerTheme {
-
-                // 4️⃣ Cria o ViewModel com Factory
-                val viewModel: HabitViewModel = viewModel(
-                    factory = HabitViewModelFactory(habitRepository)
-                )
-
-                // 5️⃣ Chama a tela
-                AddHabitScreen(viewModel = viewModel)
+                EcoTrackerApp()
             }
         }
+    }
+}
+
+@Composable
+fun EcoTrackerApp() {
+    val navController = rememberNavController()
+
+    Scaffold{ innerPadding ->
+        EcoTrackerNavGraph(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }

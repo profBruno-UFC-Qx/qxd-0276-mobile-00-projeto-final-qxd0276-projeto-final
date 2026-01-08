@@ -31,8 +31,9 @@ class HabitRepository(
             // return diferente de 0 indica sucesso na operação
             if(row == 0){
                 Result.failure(HabitError.HabitNotFound)
+            } else {
+                Result.success(Unit)
             }
-            else Result.success(Unit)
         }
         catch(e: Exception){
             Result.failure(HabitError.DatabaseError)
@@ -45,8 +46,9 @@ class HabitRepository(
 
             if (row == 0){
                 Result.failure(HabitError.HabitNotFound)
+            } else {
+                Result.success(Unit)
             }
-            else Result.success(Unit)
         }
         catch (e: Exception){
             Result.failure(HabitError.DatabaseError)
@@ -60,8 +62,9 @@ class HabitRepository(
 
             if (row == 0){
                 Result.failure(HabitError.HabitNotFound)
+            } else {
+                Result.success(Unit)
             }
-            else Result.success(Unit)
         }
         catch (e: Exception){
             Result.failure(HabitError.DatabaseError)
@@ -75,8 +78,9 @@ class HabitRepository(
 
             if (rows == 0){
                 Result.failure(HabitError.HabitNotFound)
+            } else {
+                Result.success(Unit)
             }
-            else Result.success(Unit)
         }
         catch (e: Exception){
             Result.failure(HabitError.DatabaseError)

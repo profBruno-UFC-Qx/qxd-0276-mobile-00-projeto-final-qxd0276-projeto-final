@@ -6,17 +6,15 @@ import androidx.room.Room
 
 object DatabaseProvider {
 
+    @Volatile
     private var INSTANCE: AppDataBase? = null
 
-    fun getDatabase(context: Context): AppDataBase {
-        return INSTANCE ?: synchronized(this) {
-            val instance = Room.databaseBuilder(
+    fun getDatabase(context: Context): AppDataBase =
+        INSTANCE ?: synchronized(this) {
+            INSTANCE ?: Room.databaseBuilder(
                 context.applicationContext,
                 AppDataBase::class.java,
-                "ecotracker_db"
-            ).build()
-            INSTANCE = instance
-            instance
+                "eco_tracker_db"
+            ).build().also { INSTANCE = it }
         }
-    }
 }

@@ -1,22 +1,16 @@
-// File: app/build.gradle.kts
-
-// 1. SEÇÃO DE PLUGINS
-//    Os aliases aqui (ex: libs.plugins.android.application) são definidos no seu libs.versions.toml
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    // Plugin KSP, essencial para o Room funcionar. O erro "Unresolved reference: ksp" é corrigido aqui.
     alias(libs.plugins.google.devtools.ksp)
 }
 
-// 2. SEÇÃO ANDROID
 android {
-    namespace = "com.example.ecotracker" // Troque para o seu nome de pacote real
-    compileSdk = 34 // API Level 34 (Android 14) é o padrão para novas aplicações
+    namespace = "com.example.ecotracker"
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.ecotracker"
-        minSdk = 24 // Android 7.0 (Nugat) é um bom ponto de partida
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -44,11 +38,9 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        compose = true // Habilita o Jetpack Compose
+        compose = true
     }
     composeOptions {
-        // Usa a versão do compilador do Compose que é compatível com a versão do Kotlin
-        // que definimos em libs.versions.toml (Kotlin 1.9.23)
         kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
@@ -58,8 +50,6 @@ android {
     }
 }
 
-// 3. SEÇÃO DE DEPENDÊNCIAS
-//    Aqui usamos os aliases definidos em libs.versions.toml
 dependencies {
 
     // --- Dependências Padrão (Core, Lifecycle) ---
@@ -69,23 +59,34 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // --- Jetpack Compose ---
-    // Importa o Bill of Materials (BOM) do Compose.
+    // Bill of Materials (BOM) do Compose.
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 
     // --- Room (Banco de Dados) ---
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx) // Essencial para usar Coroutines e Flow com Room
-    ksp(libs.androidx.room.compiler)        // O processador de anotações para o Room
-    implementation(libs.paging.runtime) // lib para paginação dos dados retornados
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.navigation.runtime.android)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
 
-    // --- Acesso a API ---
+    // --- ACESSO A API ---
     implementation(libs.androidx.retrofit.core)
     implementation(libs.androidx.retrofit.gson)
+
+    // --- GPS ---
+    implementation(libs.google.gms.location)
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.maps.services)
+    implementation(libs.google.places)
+
+    //--- NAVIGATION 2 ---
+    implementation(libs.navigation.compose)
     // --- Testes ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
