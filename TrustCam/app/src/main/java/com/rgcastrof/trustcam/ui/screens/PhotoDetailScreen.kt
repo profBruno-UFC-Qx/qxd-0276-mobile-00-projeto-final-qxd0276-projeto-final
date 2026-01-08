@@ -2,11 +2,9 @@ package com.rgcastrof.trustcam.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -14,17 +12,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
 import com.rgcastrof.trustcam.data.model.Photo
 import com.rgcastrof.trustcam.ui.composables.PhotoDetailOverlay
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -52,7 +46,7 @@ fun PhotoDetailScreen(
                 state = pagerState,
                 key = { photos[it].id }
             ) { index ->
-                BoxWithPhoto(
+                ZoomablePhoto(
                     photoPath = photos[index].filePath,
                     contentDescription = "Taken photo",
                     modifier = Modifier.fillMaxWidth()
@@ -83,43 +77,20 @@ fun PhotoDetailScreen(
 }
 
 @Composable
-fun BoxWithPhoto(
+fun ZoomablePhoto(
     photoPath: String,
     contentDescription: String,
     modifier: Modifier
 ) {
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
 
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val state = rememberTransformableState { zoomChange, panChange, _ ->
-            scale = (scale * zoomChange).coerceIn(1f, 5f)
-            val extraWidth = (scale - 1) * constraints.maxWidth
-            val extraHeight = (scale - 1) * constraints.maxHeight
-
-            val maxX = extraWidth / 2
-            val maxY = extraHeight / 2
-
-            offset = Offset(
-                x = (offset.x + panChange.x * scale).coerceIn(-maxX, maxX),
-                y = (offset.y + panChange.y * scale).coerceIn(-maxY, maxY)
-            )
+    val zoomState = rememberZoomState()
+    AsyncImage(
+        model = photoPath,
+        contentDescription = contentDescription,
+        modifier = modifier.fillMaxSize().zoomable(zoomState),
+        contentScale = ContentScale.Fit,
+        onSuccess = { state ->
+            zoomState.setContentSize(state.painter.intrinsicSize)
         }
-
-        AsyncImage(
-            model = photoPath,
-            contentDescription = contentDescription,
-            modifier = modifier
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    translationX = offset.x
-                    translationY = offset.y
-                }
-                .transformable(state),
-            contentScale = ContentScale.Fit
-        )
-    }
+    )
 }

@@ -16,6 +16,7 @@ navigationCompose = "2.9.6"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
 roomCompiler = "2.8.4"
+zoomable = "2.9.0"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
@@ -44,6 +45,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 
 [plugins]
