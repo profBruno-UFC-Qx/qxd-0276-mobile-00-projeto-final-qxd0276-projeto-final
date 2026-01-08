@@ -29,9 +29,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.rgcastrof.trustcam.data.model.Photo
-import java.io.File
 
 @Composable
 fun PhotoDetailOverlay(
@@ -123,12 +122,7 @@ fun ButtonWithIconAndLabel(
 
 private fun sharePhoto(context: Context, filePath: String) {
     try {
-        val file = File(filePath)
-        val contentUri: Uri = FileProvider.getUriForFile(
-            context,
-            "com.rgcastrof.trustcam.fileprovider",
-            file
-        )
+        val contentUri = filePath.toUri()
 
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
