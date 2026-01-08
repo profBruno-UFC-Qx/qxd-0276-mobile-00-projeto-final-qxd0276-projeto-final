@@ -7,9 +7,7 @@ import android.media.MediaActionSound
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -19,7 +17,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
 import com.rgcastrof.trustcam.ui.composables.CameraControls
 import com.rgcastrof.trustcam.ui.composables.CameraOptionsMenu
+import com.rgcastrof.trustcam.ui.composables.CameraOverlay
 import com.rgcastrof.trustcam.uistate.CameraUiState
 
 @Composable
@@ -37,6 +35,7 @@ fun CameraScreen(
     onNavigateToGallery: () -> Unit,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
+    onToggleAspectRatio: () -> Unit,
     storePhotoInDevice: (Bitmap) -> Unit,
     context: Context
 ) {
@@ -63,29 +62,33 @@ fun CameraScreen(
         controller.imageCaptureFlashMode = uiState.flashMode
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
     ) {
-        val cameraPreviewModifier = Modifier.fillMaxWidth().aspectRatio(9f/16)
-        Box(modifier = Modifier.fillMaxWidth()) {
-            CameraPreview(
-                gridState = uiState.gridStateOn,
-                controller = controller,
-                modifier = cameraPreviewModifier
-            )
-            CameraOptionsMenu(
-                uiState = uiState,
-                modifier = Modifier.align(Alignment.BottomEnd),
-                gridStateOn = uiState.gridStateOn,
-                onToggleFlashMode = onToggleFlashMode,
-                onToggleGridState = onToggleGridState
-            )
+        CameraPreview(
+            controller = controller,
+            modifier = Modifier.fillMaxSize()
+        )
 
-        }
+        CameraOverlay(
+            aspectRatio = uiState.aspectRatio,
+            gridState = uiState.gridStateOn
+        )
+
+        CameraOptionsMenu(
+            uiState = uiState,
+            modifier = Modifier.align(Alignment.BottomEnd),
+            gridStateOn = uiState.gridStateOn,
+            aspectRatio = uiState.aspectRatio,
+            onToggleFlashMode = onToggleFlashMode,
+            onToggleGridState = onToggleGridState,
+            onToggleAspectRatio = onToggleAspectRatio
+        )
 
         CameraControls(
+            modifier = Modifier.align(Alignment.BottomCenter),
             onOpenGallery = {
                 onNavigateToGallery()
             },
