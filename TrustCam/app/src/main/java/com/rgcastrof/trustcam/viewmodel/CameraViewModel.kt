@@ -1,9 +1,9 @@
 package com.rgcastrof.trustcam.viewmodel
 
 import android.graphics.Bitmap
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -62,10 +62,10 @@ class CameraViewModel(
 
     fun switchAspectRatio() {
         val currentAspectRatio = _uiState.value.aspectRatio
-        val nextAspectRatio = if (currentAspectRatio == AspectRatio.RATIO_16_9)
-            AspectRatio.RATIO_4_3
+        val nextAspectRatio = if (currentAspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+            AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
             else
-            AspectRatio.RATIO_16_9
+            AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
         _uiState.update { it.copy(aspectRatio = nextAspectRatio) }
     }
 

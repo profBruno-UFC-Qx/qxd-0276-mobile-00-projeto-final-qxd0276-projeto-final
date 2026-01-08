@@ -1,7 +1,7 @@
 package com.rgcastrof.trustcam.ui.composables
 
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +34,7 @@ fun CameraOptionsMenu(
     uiState: CameraUiState,
     modifier: Modifier = Modifier,
     gridStateOn: Boolean,
-    aspectRatio: Int,
+    aspectRatio: AspectRatioStrategy,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit
@@ -56,10 +56,10 @@ fun CameraOptionsMenu(
                     onClick = onToggleGridState
                 )
                 Text(
-                    text = if (aspectRatio == AspectRatio.RATIO_16_9)
-                        "16/9"
+                    text = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                        "16:9"
                         else
-                        "4/3",
+                        "4:3",
                     modifier = Modifier
                         .padding(end = 22.dp)
                         .clickable { onToggleAspectRatio() },

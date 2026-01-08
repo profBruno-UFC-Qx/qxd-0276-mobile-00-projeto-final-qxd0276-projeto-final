@@ -1,8 +1,8 @@
 package com.rgcastrof.trustcam.uistate
 
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import com.rgcastrof.trustcam.data.model.Photo
 
 data class CameraUiState(
@@ -10,5 +10,5 @@ data class CameraUiState(
     val flashMode: Int = ImageCapture.FLASH_MODE_OFF,
     val gridStateOn: Boolean = false,
     val lastTakenPhoto: Photo? = null,
-    val aspectRatio: Int = AspectRatio.RATIO_16_9
+    val aspectRatio: AspectRatioStrategy = AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
 )
