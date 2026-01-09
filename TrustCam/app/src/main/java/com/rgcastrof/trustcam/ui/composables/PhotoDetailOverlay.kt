@@ -1,9 +1,6 @@
 package com.rgcastrof.trustcam.ui.composables
 
 import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +32,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import com.rgcastrof.trustcam.data.model.Photo
+import com.rgcastrof.trustcam.utils.PhotoUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +75,7 @@ fun PhotoDetailOverlay(
                 contentDescription = "Share photo",
                 label = "Share",
                 onClick = {
-                    sharePhoto(
+                    PhotoUtils.sharePhoto(
                         context = context,
                         filePath = currentPage.filePath
                     )
@@ -138,23 +135,5 @@ fun ButtonWithIconAndLabel(
             text = label,
             fontSize = 12.sp,
         )
-    }
-}
-
-private fun sharePhoto(context: Context, filePath: String) {
-    try {
-        val contentUri = filePath.toUri()
-
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, contentUri)
-            type = "image/jpg"
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        val shareIntent = Intent.createChooser(sendIntent, "Share photo")
-        context.startActivity(shareIntent)
-    } catch (e: Exception) {
-        Log.e("PhotoDetail", "Error sharing photo: ${e.message}")
-        Toast.makeText(context, "Couldn't open sharing options.", Toast.LENGTH_SHORT).show()
     }
 }

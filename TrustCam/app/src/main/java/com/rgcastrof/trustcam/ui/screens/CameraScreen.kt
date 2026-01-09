@@ -2,9 +2,7 @@ package com.rgcastrof.trustcam.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.media.MediaActionSound
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.rgcastrof.trustcam.ui.composables.CameraPreview
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -23,10 +18,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
-import androidx.core.content.ContextCompat
 import com.rgcastrof.trustcam.ui.composables.CameraControls
 import com.rgcastrof.trustcam.ui.composables.CameraOptionsMenu
 import com.rgcastrof.trustcam.uistate.CameraUiState
+import com.rgcastrof.trustcam.utils.CameraUtils
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +94,7 @@ fun CameraScreen(
             },
             onTakePhoto = {
                 mediaActionSound.play(MediaActionSound.SHUTTER_CLICK)
-                takePhoto(
+                CameraUtils.takePhoto(
                     context = context,
                     controller = controller,
                     onPhotoCaptured = storePhotoInDevice
@@ -109,41 +104,4 @@ fun CameraScreen(
             lastTakenPhoto = uiState.lastTakenPhoto
         )
     }
-}
-
-private fun takePhoto(
-    context: Context,
-    controller: LifecycleCameraController,
-    onPhotoCaptured: (Bitmap) -> Unit
-) {
-    controller.takePicture(
-        ContextCompat.getMainExecutor(context),
-        object : ImageCapture.OnImageCapturedCallback() {
-            override fun onCaptureSuccess(image: ImageProxy) {
-                super.onCaptureSuccess(image)
-
-                val matrix = Matrix().apply {
-                    postRotate(image.imageInfo.rotationDegrees.toFloat())
-                }
-
-                val rotatedBitmap = Bitmap.createBitmap(
-                    image.toBitmap(),
-                    0,
-                    0,
-                    image.width,
-                    image.height,
-                    matrix,
-                    true
-                )
-
-                onPhotoCaptured(rotatedBitmap)
-                image.close()
-            }
-
-            override fun onError(exception: ImageCaptureException) {
-                super.onError(exception)
-                Log.e("Camera", "Couldn't take photo: $exception")
-            }
-        }
-    )
 }
