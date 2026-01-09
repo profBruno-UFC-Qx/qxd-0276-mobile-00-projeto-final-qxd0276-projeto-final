@@ -1,5 +1,7 @@
 package com.rgcastrof.trustcam.ui.composables
 
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
@@ -22,14 +24,31 @@ fun CameraPreview(
     val lifecycleOwner = LocalLifecycleOwner.current
     AndroidView(
         factory = {
-            PreviewView(it).apply {
+            val previewView = PreviewView(it).apply {
                 layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                implementationMode = PreviewView.ImplementationMode.PERFORMANCE
                 scaleType = PreviewView.ScaleType.FIT_CENTER
                 this.controller = controller
-                controller.setZoomRatio(1f)
                 controller.bindToLifecycle(lifecycleOwner)
             }
+
+            val listener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    val currentZoomRatio = controller.zoomState.value?.zoomRatio ?: 1f
+                    val delta = detector.scaleFactor
+                    controller.setZoomRatio(currentZoomRatio * delta)
+                    return true
+                }
+            }
+            val scaleGestureDetector = ScaleGestureDetector(it, listener)
+
+            previewView.setOnTouchListener { v, event ->
+                scaleGestureDetector.onTouchEvent(event)
+                if (event.action == MotionEvent.ACTION_UP)
+                    v.performClick()
+                return@setOnTouchListener true
+            }
+            previewView
         },
         modifier = modifier
     )
