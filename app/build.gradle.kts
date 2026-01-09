@@ -27,7 +27,7 @@ android {
         buildConfigField(
             "String",
             "MAPS_API_KEY",
-            "\"${project.properties["MAPS_API_KEY"]}\""
+            "\"${project.findProperty("MAPS_API_KEY") ?: ""}\""
         )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

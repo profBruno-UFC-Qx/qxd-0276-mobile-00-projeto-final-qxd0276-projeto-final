@@ -14,7 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EcoTracker">
-
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCM2W0rE69zdwbicB1TVVaYlt7jYJ8J0r8" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,7 +24,6 @@
             android:theme="@style/Theme.EcoTracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

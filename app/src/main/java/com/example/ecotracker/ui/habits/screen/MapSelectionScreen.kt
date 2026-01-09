@@ -6,7 +6,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ecotracker.ui.habits.viewmodel.mapViewModel.MapSelectionViewModelFactory
 import com.example.ecotracker.ui.map.viewmodel.MapSelectionViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
