@@ -16,12 +16,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.rgcastrof.trustcam.data.model.Photo
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoDetailOverlay(
     context: Context,
@@ -38,7 +46,11 @@ fun PhotoDetailOverlay(
     dateFormat: String,
     onBackClick: () -> Unit,
     onDeleteClick: (Photo) -> Unit,
+    onChangedPhotoDescription: (newDescription: String, photo: Photo) -> Unit
 ) {
+    var openBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState()
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -53,15 +65,6 @@ fun PhotoDetailOverlay(
                 fontSize = 16.sp,
                 modifier = Modifier.padding(top = 5.dp),
                 fontWeight = FontWeight.Bold
-            )
-        }
-        IconButton(
-            onClick = { TODO() },
-            modifier = Modifier.align(Alignment.TopEnd),
-        ) {
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = null
             )
         }
 
@@ -83,12 +86,31 @@ fun PhotoDetailOverlay(
             )
 
             ButtonWithIconAndLabel(
+                icon = Icons.Default.Info,
+                contentDescription = "Photo information",
+                label = "Information",
+                onClick = { openBottomSheet = true }
+            )
+
+            ButtonWithIconAndLabel(
                 icon = Icons.Default.DeleteOutline,
                 contentDescription = "Delete the photo",
                 label = "Delete",
                 onClick = {
                     onDeleteClick(currentPage)
                 }
+            )
+        }
+    }
+
+    if (openBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { openBottomSheet = false },
+            sheetState = bottomSheetState
+        ) {
+            InformationBottomSheet(
+                currentPage,
+                onChangePhotoDescription = onChangedPhotoDescription
             )
         }
     }

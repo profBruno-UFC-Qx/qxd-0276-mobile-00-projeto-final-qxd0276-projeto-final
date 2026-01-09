@@ -31,6 +31,7 @@ fun PhotoDetailScreen(
     onBackClick: () -> Unit,
     onImageClick: () -> Unit,
     onDeleteClick: (photo: Photo) -> Unit,
+    onChangedPhotoDescription: (newDescription: String, photo: Photo) -> Unit
 ) {
     LaunchedEffect(photos) {
         if (photos != null && photos.isEmpty()) {
@@ -66,6 +67,7 @@ fun PhotoDetailScreen(
                     dateFormat = dateFormat,
                     onBackClick = onBackClick,
                     onDeleteClick = onDeleteClick,
+                    onChangedPhotoDescription = onChangedPhotoDescription
                 )
             }
         }
