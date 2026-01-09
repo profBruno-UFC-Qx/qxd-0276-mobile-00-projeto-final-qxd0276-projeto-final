@@ -11,6 +11,7 @@ import com.rgcastrof.trustcam.data.TrustCamApplication
 import com.rgcastrof.trustcam.data.model.Photo
 import com.rgcastrof.trustcam.data.repository.CameraRepository
 import com.rgcastrof.trustcam.uistate.PhotoDetailUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -31,7 +32,7 @@ class PhotoDetailViewModel(
 
     val uiState = combine(
         _detailOverlay,
-        _allPhotos
+        _allPhotos,
     ) { detailOverlay, photos ->
         PhotoDetailUiState(
             photos = photos,
@@ -46,6 +47,17 @@ class PhotoDetailViewModel(
     fun toggleDetailOverlay() {
         _detailOverlay.update { current ->
             !current
+        }
+    }
+
+    fun changePhotoDescription(newDescription: String, photo: Photo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val updatedPhoto = cameraRepository.changePhotoDescription(newDescription, photo)
+                Log.d("PhotoDetail", "Photo description updated successful: ${updatedPhoto.description}")
+            } catch (e: Exception) {
+                Log.e("PhotoDetail", "Error to update photo description.", e)
+            }
         }
     }
 

@@ -31,6 +31,7 @@ fun PhotoDetailScreen(
     onBackClick: () -> Unit,
     onImageClick: () -> Unit,
     onDeleteClick: (photo: Photo) -> Unit,
+    onChangedPhotoDescription: (newDescription: String, photo: Photo) -> Unit
 ) {
     LaunchedEffect(photos) {
         if (photos != null && photos.isEmpty()) {
@@ -49,12 +50,8 @@ fun PhotoDetailScreen(
                 ZoomablePhoto(
                     photoPath = photos[index].filePath,
                     contentDescription = "Taken photo",
-                    modifier = Modifier.fillMaxWidth()
-                        .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onImageClick,
-                    )
+                    modifier = Modifier.fillMaxWidth(),
+                    onImageClick = onImageClick
                 )
             }
             val currentPage = photos[pagerState.currentPage.coerceAtMost(photos.lastIndex)]
@@ -70,6 +67,7 @@ fun PhotoDetailScreen(
                     dateFormat = dateFormat,
                     onBackClick = onBackClick,
                     onDeleteClick = onDeleteClick,
+                    onChangedPhotoDescription = onChangedPhotoDescription
                 )
             }
         }
@@ -80,14 +78,21 @@ fun PhotoDetailScreen(
 fun ZoomablePhoto(
     photoPath: String,
     contentDescription: String,
-    modifier: Modifier
+    modifier: Modifier,
+    onImageClick: () -> Unit
 ) {
 
     val zoomState = rememberZoomState()
     AsyncImage(
         model = photoPath,
         contentDescription = contentDescription,
-        modifier = modifier.fillMaxSize().zoomable(zoomState),
+        modifier = modifier.fillMaxSize()
+            .zoomable(zoomState)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onImageClick,
+            ),
         contentScale = ContentScale.Fit,
         onSuccess = { state ->
             zoomState.setContentSize(state.painter.intrinsicSize)
