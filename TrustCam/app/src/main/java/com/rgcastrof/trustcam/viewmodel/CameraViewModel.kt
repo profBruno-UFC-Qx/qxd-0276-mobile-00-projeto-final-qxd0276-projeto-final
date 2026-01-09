@@ -69,6 +69,11 @@ class CameraViewModel(
         _uiState.update { it.copy(aspectRatio = nextAspectRatio) }
     }
 
+    fun toggleLocation() {
+        val currentLocationState = _uiState.value.locationState
+        _uiState.update { it.copy(locationState = !currentLocationState) }
+    }
+
     fun storePhotoInDevice(bitmap: Bitmap) {
         viewModelScope.launch {
             val savedUri = cameraRepository.saveBitmapToMediaStore(bitmap)

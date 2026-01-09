@@ -33,6 +33,7 @@ fun CameraScreen(
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit,
     storePhotoInDevice: (Bitmap) -> Unit,
+    onToggleLocation: () -> Unit,
     context: Context
 ) {
     val mediaActionSound = remember { MediaActionSound() }
@@ -80,11 +81,10 @@ fun CameraScreen(
         CameraOptionsMenu(
             uiState = uiState,
             modifier = Modifier.align(Alignment.BottomEnd),
-            gridStateOn = uiState.gridStateOn,
-            aspectRatio = uiState.aspectRatio,
             onToggleFlashMode = onToggleFlashMode,
             onToggleGridState = onToggleGridState,
-            onToggleAspectRatio = onToggleAspectRatio
+            onToggleAspectRatio = onToggleAspectRatio,
+            onToggleLocation = onToggleLocation
         )
 
         CameraControls(

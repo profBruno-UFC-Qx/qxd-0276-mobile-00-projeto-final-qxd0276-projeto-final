@@ -1,6 +1,8 @@
 package com.rgcastrof.trustcam.ui.composables
 
 import android.Manifest
+import android.content.Intent
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.rgcastrof.trustcam.data.location.LocationProvider
 import com.rgcastrof.trustcam.uistate.CameraUiState
 import com.rgcastrof.trustcam.utils.PermissionUtils
 
@@ -40,13 +44,13 @@ import com.rgcastrof.trustcam.utils.PermissionUtils
 fun CameraOptionsMenu(
     uiState: CameraUiState,
     modifier: Modifier = Modifier,
-    gridStateOn: Boolean,
-    aspectRatio: AspectRatioStrategy,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
-    onToggleAspectRatio: () -> Unit
+    onToggleAspectRatio: () -> Unit,
+    onToggleLocation: () -> Unit,
 ) {
     val context = LocalContext.current
+    val locationProvider = LocationProvider(context)
     val locationPermissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissions ->
@@ -70,20 +74,24 @@ fun CameraOptionsMenu(
             Row(modifier = Modifier.padding(end = 12.dp)) {
                 MenuItem(
                     modifier = Modifier.padding(end = 22.dp),
-                    icon = if (gridStateOn) Icons.Default.GridOn else Icons.Default.GridOff,
+                    icon = if (uiState.gridStateOn) Icons.Default.GridOn else Icons.Default.GridOff,
                     contentDescription = "Camera grid button",
                     onClick = onToggleGridState
                 )
 
                 MenuItem(
                     modifier = Modifier.padding(end = 22.dp),
-                    icon = Icons.Default.LocationOn,
+                    icon = if (uiState.locationState) Icons.Default.LocationOn else Icons.Default.LocationOff,
                     contentDescription = "Camera location button",
                     onClick = {
                         val missing = PermissionUtils.getMissingPermissions(context)
 
                         if (missing.isEmpty()) {
-
+                            if (!locationProvider.isGpsEnabled()) {
+                                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            } else {
+                                onToggleLocation()
+                            }
                         } else {
                             locationPermissionsLauncher.launch(PermissionUtils.locationPermissions)
                         }
@@ -91,7 +99,7 @@ fun CameraOptionsMenu(
                 )
 
                 Text(
-                    text = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                    text = if (uiState.aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
                         "16:9"
                         else
                         "4:3",
