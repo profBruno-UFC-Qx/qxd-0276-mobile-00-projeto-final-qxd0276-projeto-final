@@ -15,15 +15,14 @@ object CameraUtils {
     fun takePhoto(
         context: Context,
         controller: LifecycleCameraController,
-        onPhotoCaptured: (Bitmap) -> Unit,
-        location: Location?
+        location: Location?,
+        onPhotoCaptured: (Bitmap, Location?) -> Unit,
     ) {
         controller.takePicture(
             ContextCompat.getMainExecutor(context),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    Log.d("LocationCamera", "Photo taken with: {${location?.latitude}}")
 
                     val matrix = Matrix().apply {
                         postRotate(image.imageInfo.rotationDegrees.toFloat())
@@ -39,7 +38,7 @@ object CameraUtils {
                         true
                     )
 
-                    onPhotoCaptured(rotatedBitmap)
+                    onPhotoCaptured(rotatedBitmap, location)
                     image.close()
                 }
 

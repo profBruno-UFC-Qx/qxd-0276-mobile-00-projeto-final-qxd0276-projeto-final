@@ -2,6 +2,7 @@ package com.rgcastrof.trustcam.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.location.Location
 import android.media.MediaActionSound
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -33,7 +34,7 @@ fun CameraScreen(
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit,
-    storePhotoInDevice: (Bitmap) -> Unit,
+    storePhotoInDevice: (Bitmap, Location?) -> Unit,
     onToggleLocation: () -> Unit,
     context: Context
 ) {
@@ -100,8 +101,8 @@ fun CameraScreen(
                 CameraUtils.takePhoto(
                     context = context,
                     controller = controller,
+                    location = locationListener.currentFetchedLocation,
                     onPhotoCaptured = storePhotoInDevice,
-                    location = locationListener.currentFetchedLocation
                 )
             },
             onSwitchCamera = onSwitchCamera,

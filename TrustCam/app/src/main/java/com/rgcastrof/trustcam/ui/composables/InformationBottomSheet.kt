@@ -1,18 +1,16 @@
 package com.rgcastrof.trustcam.ui.composables
 
 import android.os.Build
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PhotoCameraBack
 import androidx.compose.material3.Icon
@@ -59,6 +57,15 @@ fun InformationBottomSheet(
             contentDescription = "Photo metadata",
             text = "trustcam_${photo.timestamp}.jpg"
         )
+
+        if (photo.wasLocationEnabled) {
+            InformationRow(
+                modifier = Modifier.padding(start = 10.dp, top = 4.dp),
+                icon = Icons.Default.Map,
+                contentDescription = "Photo location",
+                text = "${photo.latitude}, ${photo.longitude}"
+            )
+        }
     }
 }
 

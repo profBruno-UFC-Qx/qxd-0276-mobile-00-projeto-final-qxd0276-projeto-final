@@ -1,6 +1,7 @@
 package com.rgcastrof.trustcam.viewmodel
 
 import android.graphics.Bitmap
+import android.location.Location
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
@@ -74,13 +75,16 @@ class CameraViewModel(
         _uiState.update { it.copy(locationState = !currentLocationState) }
     }
 
-    fun storePhotoInDevice(bitmap: Bitmap) {
+    fun storePhotoInDevice(bitmap: Bitmap, location: Location?) {
         viewModelScope.launch {
             val savedUri = cameraRepository.saveBitmapToMediaStore(bitmap)
             if (savedUri != null) {
                 val photo = Photo(
                     filePath = savedUri.toString(),
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    latitude = location?.latitude,
+                    longitude = location?.longitude,
+                    wasLocationEnabled = _uiState.value.locationState
                 )
                 cameraRepository.insert(photo)
             }
