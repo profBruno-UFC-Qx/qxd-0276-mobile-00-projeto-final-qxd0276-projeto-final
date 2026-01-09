@@ -1,26 +1,27 @@
 [versions]
-agp = "8.3.2"
-kotlin = "1.9.23"
-coreKtx = "1.12.0"
+agp = "8.9.1"
+kotlin = "2.0.21"
+coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.02.02"
+activityCompose = "1.9.0"
+composeBom = "2024.09.00"
+composeCompiler = "2.0.10"
 room = "2.6.1"
-ksp = "1.9.23-1.0.19"
+ksp = "2.0.21-1.0.28"
 retrofit = "2.11.0"
 paging = "3.3.2"
-lifecycle = "2.9.4"
+lifecycle = "2.8.1"
 navigationRuntimeAndroid = "2.9.6"
 composeMaterialIcons = "1.7.0"
 googleGmsLocation = "21.3.0"
-googleMapsCompose = "7.0.0"
-googleMapsServices = "19.2.0"
-googlePlaces = "5.1.1"
+googleMapsCompose = "6.4.1"
+googleMapsServices = "18.2.0"
+googlePlaces = "3.4.0"
 #Navigation
-navigation = "2.8.5"
+navigation = "2.9.6"
 
 [libraries]
 # --- CORE & LIFECYCLE ---
@@ -42,6 +43,7 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 # --- Retrofit ---
 androidx-retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -74,4 +76,5 @@ androidx-navigation-runtime-android = { group = "androidx.navigation", name = "n
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "composeCompiler" }
 

@@ -2,6 +2,7 @@ package com.example.ecotracker.data.local.dao
 
 import android.R
 import androidx.paging.PagingSource
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,6 +11,7 @@ import androidx.room.Update
 import com.example.ecotracker.data.local.entity.User
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 interface UserDao {
     // Crud User
     @Insert(onConflict = OnConflictStrategy.ABORT)

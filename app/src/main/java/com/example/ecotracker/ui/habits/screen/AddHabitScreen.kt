@@ -1,6 +1,5 @@
 package com.example.ecotracker.ui.habits.screen
 
-import MapSelectionScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.ecotracker.ui.habits.viewmodel.HabitViewModel
+import com.example.ecotracker.ui.map.screen.MapSelectionScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +43,7 @@ fun AddHabitScreen(
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
-    // ESTADOS PARA O LOCAL SELECIONADO
+    // Estados para controlar os dados de localização
     var locationName by remember { mutableStateOf<String?>(null) }
     var latitude by remember { mutableStateOf<Double?>(null) }
     var longitude by remember { mutableStateOf<Double?>(null) }
@@ -70,7 +72,18 @@ fun AddHabitScreen(
     // ... (Seu LaunchedEffect para reagir a operationUiState permanece o mesmo)
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Adicionar Novo Hábito") }) }
+        topBar = {
+            TopAppBar(
+                title = {Text("Adicionar Novo Hábito")},
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Voltar"
+                        )
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

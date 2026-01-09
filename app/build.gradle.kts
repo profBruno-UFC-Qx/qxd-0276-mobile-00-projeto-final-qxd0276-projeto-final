@@ -2,19 +2,33 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.jetbrains.compose)
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion("2.0.21")
+            because("Force Kotlin stdlib to avoid metadata 2.2 conflict with KSP")
+        }
+    }
+}
 android {
     namespace = "com.example.ecotracker"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.ecotracker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField(
+            "String",
+            "MAPS_API_KEY",
+            "\"${project.properties["MAPS_API_KEY"]}\""
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -30,18 +44,19 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.11"
+//    }
+    compileOptions{
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
     }
     packaging {
         resources {
@@ -70,10 +85,10 @@ dependencies {
     // --- Room (Banco de Dados) ---
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.navigation.runtime.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+    implementation(libs.androidx.room.paging)
 
     // --- ACESSO A API ---
     implementation(libs.androidx.retrofit.core)

@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.ecotracker.data.local.database.DatabaseProvider
 import com.example.ecotracker.data.repository.HabitRepository
 import com.example.ecotracker.data.repository.UserRepository
+import com.google.android.libraries.places.api.Places
 
 class AppContainer(context: Context) {
 
