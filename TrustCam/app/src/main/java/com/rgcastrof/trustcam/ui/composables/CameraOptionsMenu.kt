@@ -1,5 +1,9 @@
 package com.rgcastrof.trustcam.ui.composables
 
+import android.Manifest
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.compose.animation.AnimatedVisibility
@@ -16,6 +20,7 @@ import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.rgcastrof.trustcam.uistate.CameraUiState
+import com.rgcastrof.trustcam.utils.PermissionUtils
 
 @Composable
 fun CameraOptionsMenu(
@@ -39,6 +46,18 @@ fun CameraOptionsMenu(
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit
 ) {
+    val context = LocalContext.current
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissions ->
+        val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION]
+        val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION]
+
+        if (fineGranted != true || coarseGranted != true) {
+            Toast.makeText(context, "This app needs location permission to save photo location", Toast.LENGTH_LONG).show()
+        }
+    }
+
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
@@ -55,6 +74,22 @@ fun CameraOptionsMenu(
                     contentDescription = "Camera grid button",
                     onClick = onToggleGridState
                 )
+
+                MenuItem(
+                    modifier = Modifier.padding(end = 22.dp),
+                    icon = Icons.Default.LocationOn,
+                    contentDescription = "Camera location button",
+                    onClick = {
+                        val missing = PermissionUtils.getMissingPermissions(context)
+
+                        if (missing.isEmpty()) {
+
+                        } else {
+                            locationPermissionsLauncher.launch(PermissionUtils.locationPermissions)
+                        }
+                    }
+                )
+
                 Text(
                     text = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
                         "16:9"
