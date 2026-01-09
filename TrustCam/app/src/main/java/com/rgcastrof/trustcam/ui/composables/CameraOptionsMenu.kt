@@ -3,6 +3,7 @@ package com.rgcastrof.trustcam.ui.composables
 import android.Manifest
 import android.content.Intent
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,15 +31,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.rgcastrof.trustcam.data.location.LocationProvider
+import com.rgcastrof.trustcam.data.location.LocationListener
 import com.rgcastrof.trustcam.uistate.CameraUiState
 import com.rgcastrof.trustcam.utils.PermissionUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun CameraOptionsMenu(
@@ -48,9 +51,10 @@ fun CameraOptionsMenu(
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit,
     onToggleLocation: () -> Unit,
+    locationListener: LocationListener
 ) {
     val context = LocalContext.current
-    val locationProvider = LocationProvider(context)
+    val scope = rememberCoroutineScope()
     val locationPermissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissions ->
@@ -87,10 +91,20 @@ fun CameraOptionsMenu(
                         val missing = PermissionUtils.getMissingPermissions(context)
 
                         if (missing.isEmpty()) {
-                            if (!locationProvider.isGpsEnabled()) {
+                            if (!locationListener.isGpsEnabled()) {
                                 context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                             } else {
                                 onToggleLocation()
+
+                                if (!uiState.locationState) {
+                                    scope.launch {
+                                        locationListener.requestLocation()
+                                        Log.d("Location", "GPS start listening")
+                                    }
+                                } else {
+                                    locationListener.stopRequest()
+                                    Log.d("Location", "GPS stop listening")
+                                }
                             }
                         } else {
                             locationPermissionsLauncher.launch(PermissionUtils.locationPermissions)

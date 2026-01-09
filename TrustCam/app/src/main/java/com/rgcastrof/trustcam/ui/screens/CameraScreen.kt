@@ -18,6 +18,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
+import com.rgcastrof.trustcam.data.location.LocationListener
 import com.rgcastrof.trustcam.ui.composables.CameraControls
 import com.rgcastrof.trustcam.ui.composables.CameraOptionsMenu
 import com.rgcastrof.trustcam.uistate.CameraUiState
@@ -37,6 +38,7 @@ fun CameraScreen(
     context: Context
 ) {
     val mediaActionSound = remember { MediaActionSound() }
+    val locationListener = remember { LocationListener(context) }
 
     DisposableEffect(Unit) {
         mediaActionSound.load(MediaActionSound.SHUTTER_CLICK)
@@ -84,7 +86,8 @@ fun CameraScreen(
             onToggleFlashMode = onToggleFlashMode,
             onToggleGridState = onToggleGridState,
             onToggleAspectRatio = onToggleAspectRatio,
-            onToggleLocation = onToggleLocation
+            onToggleLocation = onToggleLocation,
+            locationListener = locationListener
         )
 
         CameraControls(
@@ -97,7 +100,8 @@ fun CameraScreen(
                 CameraUtils.takePhoto(
                     context = context,
                     controller = controller,
-                    onPhotoCaptured = storePhotoInDevice
+                    onPhotoCaptured = storePhotoInDevice,
+                    location = locationListener.currentFetchedLocation
                 )
             },
             onSwitchCamera = onSwitchCamera,

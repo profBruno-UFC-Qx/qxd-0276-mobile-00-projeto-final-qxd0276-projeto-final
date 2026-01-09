@@ -3,6 +3,7 @@ package com.rgcastrof.trustcam.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.location.Location
 import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -14,13 +15,15 @@ object CameraUtils {
     fun takePhoto(
         context: Context,
         controller: LifecycleCameraController,
-        onPhotoCaptured: (Bitmap) -> Unit
+        onPhotoCaptured: (Bitmap) -> Unit,
+        location: Location?
     ) {
         controller.takePicture(
             ContextCompat.getMainExecutor(context),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
+                    Log.d("LocationCamera", "Photo taken with: {${location?.latitude}}")
 
                     val matrix = Matrix().apply {
                         postRotate(image.imageInfo.rotationDegrees.toFloat())
