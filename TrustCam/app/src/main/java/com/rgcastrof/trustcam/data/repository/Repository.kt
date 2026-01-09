@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import com.rgcastrof.trustcam.data.model.Photo
 import com.rgcastrof.trustcam.data.dao.PhotoDao
 import kotlinx.coroutines.Dispatchers
@@ -21,10 +22,18 @@ class CameraRepository(
     fun getAllPhotos() = dao.getAllPhotos()
     fun getLastPhoto() = dao.getLastPhoto()
 
+    /* TODO: Implement description update into MediaStore */
+    suspend fun changePhotoDescription(newDescription: String, photo: Photo): Photo {
+        val updatedPhoto = photo.copy(description = newDescription)
+        dao.changePhotoDescription(updatedPhoto)
+        return updatedPhoto
+    }
+
     suspend fun deleteFromRoomAndDevice(photo: Photo) = withContext(Dispatchers.IO) {
         try {
             contentResolver.delete(photo.filePath.toUri(), null, null)
             dao.deletePhoto(photo)
+            Log.d("Repository", "Photo was successful deleted: ${photo.filePath}")
         } catch (e: Exception) {
             e.printStackTrace()
         }
