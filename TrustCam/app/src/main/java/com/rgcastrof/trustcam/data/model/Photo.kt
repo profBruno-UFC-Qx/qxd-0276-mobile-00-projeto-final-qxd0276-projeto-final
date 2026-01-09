@@ -8,5 +8,8 @@ data class Photo(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val filePath: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val description: String = ""
+    val description: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val wasLocationEnabled: Boolean = false
 )

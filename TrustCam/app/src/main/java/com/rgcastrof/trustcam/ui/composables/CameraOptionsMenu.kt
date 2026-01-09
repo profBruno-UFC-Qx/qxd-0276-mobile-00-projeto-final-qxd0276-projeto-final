@@ -1,5 +1,12 @@
 package com.rgcastrof.trustcam.ui.composables
 
+import android.Manifest
+import android.content.Intent
+import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.compose.animation.AnimatedVisibility
@@ -16,29 +23,49 @@ import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.LocationOff
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.rgcastrof.trustcam.data.location.LocationListener
 import com.rgcastrof.trustcam.uistate.CameraUiState
+import com.rgcastrof.trustcam.utils.PermissionUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun CameraOptionsMenu(
     uiState: CameraUiState,
     modifier: Modifier = Modifier,
-    gridStateOn: Boolean,
-    aspectRatio: AspectRatioStrategy,
     onToggleFlashMode: () -> Unit,
     onToggleGridState: () -> Unit,
-    onToggleAspectRatio: () -> Unit
+    onToggleAspectRatio: () -> Unit,
+    onToggleLocation: () -> Unit,
+    locationListener: LocationListener
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val locationPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissions ->
+        val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION]
+        val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION]
+
+        if (fineGranted != true || coarseGranted != true) {
+            Toast.makeText(context, "This app needs location permission to save photo location", Toast.LENGTH_LONG).show()
+        }
+    }
+
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
@@ -51,12 +78,42 @@ fun CameraOptionsMenu(
             Row(modifier = Modifier.padding(end = 12.dp)) {
                 MenuItem(
                     modifier = Modifier.padding(end = 22.dp),
-                    icon = if (gridStateOn) Icons.Default.GridOn else Icons.Default.GridOff,
+                    icon = if (uiState.gridStateOn) Icons.Default.GridOn else Icons.Default.GridOff,
                     contentDescription = "Camera grid button",
                     onClick = onToggleGridState
                 )
+
+                MenuItem(
+                    modifier = Modifier.padding(end = 22.dp),
+                    icon = if (uiState.locationState) Icons.Default.LocationOn else Icons.Default.LocationOff,
+                    contentDescription = "Camera location button",
+                    onClick = {
+                        val missing = PermissionUtils.getMissingPermissions(context)
+
+                        if (missing.isEmpty()) {
+                            if (!locationListener.isGpsEnabled()) {
+                                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            } else {
+                                onToggleLocation()
+
+                                if (!uiState.locationState) {
+                                    scope.launch {
+                                        locationListener.requestLocation()
+                                        Log.d("Location", "GPS start listening")
+                                    }
+                                } else {
+                                    locationListener.stopRequest()
+                                    Log.d("Location", "GPS stop listening")
+                                }
+                            }
+                        } else {
+                            locationPermissionsLauncher.launch(PermissionUtils.locationPermissions)
+                        }
+                    }
+                )
+
                 Text(
-                    text = if (aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                    text = if (uiState.aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
                         "16:9"
                         else
                         "4:3",

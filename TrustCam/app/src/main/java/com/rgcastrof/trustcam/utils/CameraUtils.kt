@@ -3,6 +3,7 @@ package com.rgcastrof.trustcam.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.location.Location
 import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -14,7 +15,8 @@ object CameraUtils {
     fun takePhoto(
         context: Context,
         controller: LifecycleCameraController,
-        onPhotoCaptured: (Bitmap) -> Unit
+        location: Location?,
+        onPhotoCaptured: (Bitmap, Location?) -> Unit,
     ) {
         controller.takePicture(
             ContextCompat.getMainExecutor(context),
@@ -36,7 +38,7 @@ object CameraUtils {
                         true
                     )
 
-                    onPhotoCaptured(rotatedBitmap)
+                    onPhotoCaptured(rotatedBitmap, location)
                     image.close()
                 }
 
