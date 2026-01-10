@@ -1,9 +1,22 @@
 package com.rgcastrof.trustcam
 
 import android.content.Context
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +37,12 @@ sealed class Screen(val route: String) {
 fun TrustCamNavigation(context: Context) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.CameraScreen.route) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.CameraScreen.route,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
+    ) {
         composable(route = Screen.CameraScreen.route) {
             val viewModel: CameraViewModel = viewModel(factory = CameraViewModel.Factory)
             val uiState by viewModel.uiState.collectAsState()
@@ -47,19 +65,46 @@ fun TrustCamNavigation(context: Context) {
 
         composable(
             route = Screen.PhotoDetailScreen.route,
-        ) {
-            val viewModel: PhotoDetailViewModel = viewModel(factory = PhotoDetailViewModel.Factory)
-            val uiState by viewModel.uiState.collectAsState()
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        200, easing = LinearEasing
+                    )
+                ) + slideIntoContainer(
+                    animationSpec = tween(200, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
 
-            PhotoDetailScreen(
-                context = context,
-                showOverlay = uiState.detailOverlay,
-                photos = uiState.photos,
-                onBackClick = { navController.popBackStack() },
-                onDeleteClick = viewModel::deletePhoto,
-                onImageClick = viewModel::toggleDetailOverlay,
-                onChangedPhotoDescription = viewModel::changePhotoDescription
-            )
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        200, easing = LinearEasing
+                    )
+                ) + slideOutOfContainer(
+                    animationSpec = tween(200, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black
+            ) {
+                val viewModel: PhotoDetailViewModel =
+                    viewModel(factory = PhotoDetailViewModel.Factory)
+                val uiState by viewModel.uiState.collectAsState()
+
+                PhotoDetailScreen(
+                    context = context,
+                    showOverlay = uiState.detailOverlay,
+                    photos = uiState.photos,
+                    onBackClick = { navController.popBackStack() },
+                    onDeleteClick = viewModel::deletePhoto,
+                    onImageClick = viewModel::toggleDetailOverlay,
+                    onChangedPhotoDescription = viewModel::changePhotoDescription
+                )
+            }
         }
     }
 }
