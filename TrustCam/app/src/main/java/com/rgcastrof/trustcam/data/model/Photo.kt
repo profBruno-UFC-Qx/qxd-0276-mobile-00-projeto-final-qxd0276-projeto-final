@@ -11,5 +11,5 @@ data class Photo(
     val description: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val wasLocationEnabled: Boolean = false
+    val wasLocationDetected: Boolean = false
 )

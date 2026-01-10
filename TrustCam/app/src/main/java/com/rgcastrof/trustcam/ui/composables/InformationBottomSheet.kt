@@ -74,7 +74,7 @@ fun InformationBottomSheet(
             text = "trustcam_${photo.timestamp}.jpg"
         )
 
-        if (photo.wasLocationEnabled) {
+        if (photo.wasLocationDetected) {
             InformationRow(
                 modifier = Modifier
                     .padding(start = 10.dp, top = 4.dp)

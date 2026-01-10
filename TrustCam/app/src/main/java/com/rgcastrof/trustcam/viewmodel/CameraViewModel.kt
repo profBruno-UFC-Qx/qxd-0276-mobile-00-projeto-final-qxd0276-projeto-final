@@ -84,7 +84,7 @@ class CameraViewModel(
                     timestamp = System.currentTimeMillis(),
                     latitude = location?.latitude,
                     longitude = location?.longitude,
-                    wasLocationEnabled = _uiState.value.locationState
+                    wasLocationDetected = (location?.latitude != null)
                 )
                 cameraRepository.insert(photo)
             }

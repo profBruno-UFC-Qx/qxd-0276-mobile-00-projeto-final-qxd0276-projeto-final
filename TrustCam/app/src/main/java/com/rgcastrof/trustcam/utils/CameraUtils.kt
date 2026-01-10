@@ -24,6 +24,8 @@ object CameraUtils {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
 
+                    Log.d("Location", "Location captured: ${location?.latitude}")
+
                     val matrix = Matrix().apply {
                         postRotate(image.imageInfo.rotationDegrees.toFloat())
                     }
