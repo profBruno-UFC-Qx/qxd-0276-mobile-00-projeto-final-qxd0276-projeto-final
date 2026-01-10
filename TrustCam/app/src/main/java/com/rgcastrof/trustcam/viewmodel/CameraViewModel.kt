@@ -63,10 +63,10 @@ class CameraViewModel(
 
     fun switchAspectRatio() {
         val currentAspectRatio = _uiState.value.aspectRatio
-        val nextAspectRatio = if (currentAspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
-            AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
-            else
+        val nextAspectRatio = if (currentAspectRatio == AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
             AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY
+            else
+            AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY
         _uiState.update { it.copy(aspectRatio = nextAspectRatio) }
     }
 

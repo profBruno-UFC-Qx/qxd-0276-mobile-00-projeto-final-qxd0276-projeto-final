@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FlashAuto
 import androidx.compose.material.icons.filled.FlashOff
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +57,7 @@ fun CameraOptionsMenu(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
     val locationPermissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissions ->
@@ -67,6 +70,7 @@ fun CameraOptionsMenu(
     }
 
     var expanded by remember { mutableStateOf(false) }
+
     Row(
         modifier = modifier
             .padding(end = 30.dp, bottom = 110.dp)
@@ -113,10 +117,10 @@ fun CameraOptionsMenu(
                 )
 
                 Text(
-                    text = if (uiState.aspectRatio == AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
-                        "16:9"
+                    text = if (uiState.aspectRatio == AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                        "4:3"
                         else
-                        "4:3",
+                        "16:9",
                     modifier = Modifier
                         .padding(end = 22.dp)
                         .clickable { onToggleAspectRatio() },

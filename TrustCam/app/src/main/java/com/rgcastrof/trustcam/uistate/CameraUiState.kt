@@ -10,6 +10,6 @@ data class CameraUiState(
     val flashMode: Int = ImageCapture.FLASH_MODE_OFF,
     val gridStateOn: Boolean = false,
     val lastTakenPhoto: Photo? = null,
-    val aspectRatio: AspectRatioStrategy = AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY,
+    val aspectRatio: AspectRatioStrategy = AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY,
     val locationState: Boolean = false
 )
