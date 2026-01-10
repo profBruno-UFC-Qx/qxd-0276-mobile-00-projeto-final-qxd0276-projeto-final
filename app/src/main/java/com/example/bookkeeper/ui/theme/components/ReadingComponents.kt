@@ -7,17 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.bookkeeper.BabyPink
-import com.example.bookkeeper.DarkGrey
-import com.example.bookkeeper.SoftRose
-import com.example.bookkeeper.White
-
 
 @Composable
 fun SaveSessionDialog(
@@ -31,7 +24,10 @@ fun SaveSessionDialog(
         Dialog(onDismissRequest = onDismiss) {
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = White),
+                colors = CardDefaults.cardColors(
+                    // Usa a cor de superfície do tema (Branco Quente ou Madeira Escura)
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
                 elevation = CardDefaults.cardElevation(8.dp),
                 modifier = Modifier
                     .padding(16.dp)
@@ -43,15 +39,17 @@ fun SaveSessionDialog(
                 ) {
                     Text(
                         text = "Sessão Finalizada!",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SoftRose
+                        // Aplica a fonte Bellefair e a cor Bronze
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Quantas páginas você leu hoje?",
-                        color = DarkGrey,
-                        fontSize = 16.sp
+                        // Aplica a fonte Lato e a cor de texto padrão
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -66,10 +64,13 @@ fun SaveSessionDialog(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BabyPink,
-                            unfocusedBorderColor = Color.LightGray,
-                            focusedLabelColor = BabyPink,
-                            cursorColor = SoftRose
+                            // Configura as cores do campo de texto para seguir o tema Dourado/Bronze
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            cursorColor = MaterialTheme.colorScheme.primary,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                         ),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -82,15 +83,24 @@ fun SaveSessionDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         TextButton(onClick = onDismiss) {
-                            Text("Descartar", color = Color.Gray)
+                            Text(
+                                "Descartar",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                         Button(
                             onClick = onConfirm,
-                            colors = ButtonDefaults.buttonColors(containerColor = BabyPink),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary // Botão Bronze
+                            ),
                             shape = RoundedCornerShape(12.dp),
                             enabled = inputValue.isNotEmpty() && (inputValue.toIntOrNull() ?: 0) > 0
                         ) {
-                            Text("Salvar", color = White, fontWeight = FontWeight.Bold)
+                            Text(
+                                "Salvar",
+                                color = MaterialTheme.colorScheme.onPrimary, // Texto Creme/Preto
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,7 +49,6 @@ fun ProfileScreen(
     var tempEmail by remember { mutableStateOf("") }
     var tempPass by remember { mutableStateOf("") }
     var tempUri by remember { mutableStateOf<Uri?>(null) }
-
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(user) {
@@ -65,9 +63,7 @@ fun ProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            try {
-                context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } catch (e: Exception) { }
+            try { context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (e: Exception) { }
             tempUri = uri
         }
     }
@@ -75,199 +71,196 @@ fun ProfileScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Excluir Conta?") },
-            text = { Text("Tem certeza? Todos os seus livros e anotações serão apagados permanentemente.") },
+            title = { Text("Excluir Conta?", color = MaterialTheme.colorScheme.primary) },
+            text = { Text("Tem certeza? Todos os seus livros e anotações serão apagados permanentemente.", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 Button(
-                    onClick = {
-                        showDeleteDialog = false
-                        viewModel.deleteAccount {
-                            Toast.makeText(context, "Conta excluída.", Toast.LENGTH_LONG).show()
-                            onLogoutClick()
-                        }
-                    },
+                    onClick = { showDeleteDialog = false; viewModel.deleteAccount { Toast.makeText(context, "Conta excluída.", Toast.LENGTH_LONG).show(); onLogoutClick() } },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("Sim, Excluir")
-                }
+                ) { Text("Sim, Excluir") }
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancelar") }
-            }
+            dismissButton = { TextButton(onClick = { showDeleteDialog = false }) { Text("Cancelar") } },
+            containerColor = MaterialTheme.colorScheme.surface
         )
     }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .verticalScroll(scrollState),
+            modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // HEADER
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(320.dp)
+                    .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground)
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.padding(top = 48.dp, start = 16.dp).align(Alignment.TopStart)
+                ) {
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar", tint = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Perfil do Leitor",
-                    fontSize = 22.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontFamily = FontFamily.Serif
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.size(48.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(top = 80.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        contentAlignment = Alignment.BottomEnd,
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clickable(enabled = isEditing) { photoPickerLauncher.launch("image/*") }
+                    ) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surface,
+                            shadowElevation = 8.dp,
+                            border = androidx.compose.foundation.BorderStroke(4.dp, MaterialTheme.colorScheme.surface)
+                        ) {
+                            if (tempUri != null) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(tempUri),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize().clip(CircleShape)
+                                )
+                            } else {
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+                                    Icon(Icons.Rounded.Person, null, modifier = Modifier.size(70.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                        if (isEditing) {
+                            Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp).padding(4.dp)) {
+                                Icon(Icons.Rounded.AddAPhoto, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(8.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (!isEditing) {
+                        Text(user?.name ?: "Leitor", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
+                        Text(user?.email ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.8f))
+                    } else {
+                        Text("Editando Perfil...", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                }
             }
 
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clickable(enabled = isEditing) { photoPickerLauncher.launch("image/*") }
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shadowElevation = 8.dp
-                ) {
-                    if (tempUri != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(tempUri),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                Icons.Rounded.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(60.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                // Bio Card
+                if (!isEditing && tempBio.isNotBlank()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(2.dp)
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text("Biografia", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                            Spacer(Modifier.height(8.dp))
+                            Text(tempBio, style = MaterialTheme.typography.bodyMedium, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
                         }
                     }
                 }
+
                 if (isEditing) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(36.dp).padding(4.dp)
-                    ) {
-                        Icon(Icons.Rounded.AddAPhoto, contentDescription = null, tint = Color.White, modifier = Modifier.padding(6.dp))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    if (!isEditing) {
-                        Text(user?.name ?: "", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(user?.email ?: "", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(tempBio.ifBlank { "Sem biografia..." }, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    } else {
-                        // MODO EDIÇÃO
-                        OutlinedTextField(value = tempName, onValueChange = { tempName = it }, label = { Text("Nome") }, modifier = Modifier.fillMaxWidth())
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(value = tempBio, onValueChange = { tempBio = it }, label = { Text("Bio") }, modifier = Modifier.fillMaxWidth())
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = tempEmail,
-                            onValueChange = { tempEmail = it },
-                            label = { Text("Email") },
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = tempPass,
-                            onValueChange = { tempPass = it },
-                            label = { Text("Senha") },
-                            modifier = Modifier.fillMaxWidth(),
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    if (isEditing) {
-                        viewModel.updateUserProfile(tempName, tempBio, tempEmail, tempPass, tempUri?.toString())
-                        isEditing = false
-                        Toast.makeText(context, "Perfil Atualizado!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        isEditing = true
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(if (isEditing) "Salvar Alterações" else "Editar Perfil", color = MaterialTheme.colorScheme.onPrimary)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            if (!isEditing) {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (isDark) Icons.Rounded.DarkMode else Icons.Rounded.LightMode,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text("Modo Escuro", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onBackground)
-                    }
-                    Switch(checked = isDark, onCheckedChange = { viewModel.toggleTheme() })
+                    VintageOutlinedTextField(tempName, { tempName = it }, "Nome", Icons.Rounded.Person)
+                    Spacer(Modifier.height(12.dp))
+                    VintageOutlinedTextField(tempBio, { tempBio = it }, "Bio", Icons.Rounded.FormatQuote)
+                    Spacer(Modifier.height(12.dp))
+                    VintageOutlinedTextField(tempEmail, { tempEmail = it }, "Email", Icons.Rounded.Email, keyboardType = KeyboardType.Email)
+                    Spacer(Modifier.height(12.dp))
+                    VintageOutlinedTextField(tempPass, { tempPass = it }, "Senha", Icons.Rounded.Lock, isPassword = true)
+                    Spacer(Modifier.height(24.dp))
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedButton(
+                Button(
                     onClick = {
-                        viewModel.logout()
-                        onLogoutClick()
+                        if (isEditing) {
+                            viewModel.updateUserProfile(tempName, tempBio, tempEmail, tempPass, tempUri?.toString())
+                            isEditing = false
+                            Toast.makeText(context, "Perfil Atualizado!", Toast.LENGTH_SHORT).show()
+                        } else { isEditing = true }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Sair da conta")
+                    Icon(if (isEditing) Icons.Rounded.Check else Icons.Rounded.Edit, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(if (isEditing) "Salvar Alterações" else "Editar Perfil")
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (!isEditing) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                TextButton(
-                    onClick = { showDeleteDialog = true },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Rounded.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Excluir conta permanentemente")
+                    // MODO ESCURO
+                    Surface(
+                        onClick = { viewModel.toggleTheme() },
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(if (isDark) Icons.Rounded.DarkMode else Icons.Rounded.LightMode, null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(Modifier.width(16.dp))
+                                Text("Modo Escuro")
+                            }
+                            Switch(checked = isDark, onCheckedChange = { viewModel.toggleTheme() })
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = { viewModel.logout(); onLogoutClick() },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.Logout, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Sair da conta")
+                    }
+
+                    TextButton(
+                        onClick = { showDeleteDialog = true },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Rounded.DeleteForever, null, Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Excluir conta permanentemente")
+                    }
                 }
+                Spacer(modifier = Modifier.height(50.dp))
             }
-
-            Spacer(modifier = Modifier.height(50.dp))
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VintageOutlinedTextField(value: String, onValueChange: (String) -> Unit, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, isPassword: Boolean = false, keyboardType: KeyboardType = KeyboardType.Text) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
+    )
 }

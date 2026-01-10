@@ -7,31 +7,29 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = LeatherBrown,
-    onPrimary = Color.White,
-    secondary = GoldAccent,
-    onSecondary = Color.Black,
-    background = DarkBackground,
-    surface = DarkSurface,
-    onBackground = LightText,
-    onSurface = LightText
+    primary = GoldHighlight,
+    onPrimary = DeepCoffee,
+    secondary = LeatherBrown,
+    onSecondary = GoldHighlight,
+    background = InkBlack,
+    surface = DeepCoffee,
+    onBackground = TextDark,
+    onSurface = TextDark
 )
-
 private val LightColorScheme = lightColorScheme(
     primary = LeatherBrown,
-    onPrimary = Color.White,
-    secondary = GoldAccent,
-    onSecondary = LeatherBrown,
+    onPrimary = OldPaper,
+    secondary = GoldHighlight,
+    onSecondary = DeepCoffee,
     background = OldPaper,
-    surface = OldPaper,
-    onBackground = InkBlack,
-    onSurface = InkBlack,
+    surface = WhiteWarm,
+    onBackground = TextLight,
+    onSurface = TextLight,
 )
 
 @Composable
@@ -41,12 +39,13 @@ fun BookKeeperTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
     val view = LocalView.current
+
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
+
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

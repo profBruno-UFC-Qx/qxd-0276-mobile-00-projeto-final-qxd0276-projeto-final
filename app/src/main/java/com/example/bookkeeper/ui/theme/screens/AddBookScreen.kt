@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookkeeper.model.Book
-import com.example.bookkeeper.ui.theme.GoldAccent
+import com.example.bookkeeper.ui.theme.GoldHighlight
 import com.example.bookkeeper.viewmodel.BookViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch // <--- Importante
+import kotlinx.coroutines.launch
 
 private enum class ScreenMode {
     SELECTION, ISBN_MANUAL, MANUAL_FORM, SCANNER
@@ -68,7 +68,6 @@ fun AddBookScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // 1. CRIA O ESCOPO
     val scope = rememberCoroutineScope()
 
     var hasCameraPermission by remember {
@@ -89,7 +88,6 @@ fun AddBookScreen(
         else permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
-    // 2. CORRIGE O LAUNCHER DA GALERIA
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             scope.launch {
@@ -98,7 +96,6 @@ fun AddBookScreen(
         }
     }
 
-    // 3. CORRIGE O LAUNCHER DA CÂMERA
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         if (bitmap != null) {
             scope.launch {
@@ -210,7 +207,7 @@ fun AddBookScreen(
                             Spacer(Modifier.height(16.dp))
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                                 listOf("Quero Ler", "Lendo", "Lido").forEach { status ->
-                                    FilterChip(selected = selectedStatus == status, onClick = { selectedStatus = status }, label = { Text(status) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = GoldAccent))
+                                    FilterChip(selected = selectedStatus == status, onClick = { selectedStatus = status }, label = { Text(status) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.secondary))
                                 }
                             }
                             Spacer(Modifier.height(80.dp))

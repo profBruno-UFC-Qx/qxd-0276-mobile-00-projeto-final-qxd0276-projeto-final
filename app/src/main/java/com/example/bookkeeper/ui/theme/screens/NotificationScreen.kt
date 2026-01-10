@@ -14,16 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.bookkeeper.BabyPink
-import com.example.bookkeeper.DarkGrey
-import com.example.bookkeeper.LightPinkBg
-import com.example.bookkeeper.SoftRose
-import com.example.bookkeeper.White
 
 // Dados de exemplo para preencher a tela
 data class DummyNotification(val id: Int, val title: String, val message: String, val time: String)
@@ -40,24 +33,24 @@ fun NotificationScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Notificações", fontFamily = FontFamily.Serif, color = SoftRose, fontWeight = FontWeight.Bold) },
+                title = { Text("Notificações", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar", tint = BabyPink)
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = White
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (sampleNotifications.isEmpty()) {
             // Estado Vazio
             Box(modifier = Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Rounded.Notifications, null, modifier = Modifier.size(60.dp), tint = BabyPink.copy(alpha = 0.4f))
+                    Icon(Icons.Rounded.Notifications, null, modifier = Modifier.size(60.dp), tint = MaterialTheme.colorScheme.outline)
                     Spacer(Modifier.height(16.dp))
-                    Text("Nenhuma notificação nova.", color = Color.Gray, fontFamily = FontFamily.Serif)
+                    Text("Nenhuma notificação nova.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -78,25 +71,25 @@ fun NotificationScreen(onBackClick: () -> Unit) {
 @Composable
 fun NotificationCard(notification: DummyNotification) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = LightPinkBg),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(0.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-            Surface(shape = CircleShape, color = BabyPink, modifier = Modifier.size(40.dp)) {
+            Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(40.dp)) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Rounded.Notifications, null, tint = White, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Rounded.Notifications, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
                 }
             }
             Spacer(Modifier.width(16.dp))
             Column {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(notification.title, fontWeight = FontWeight.Bold, color = DarkGrey, fontSize = 16.sp)
-                    Text(notification.time, color = Color.Gray, fontSize = 12.sp)
+                    Text(notification.title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp)
+                    Text(notification.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(notification.message, color = DarkGrey, fontSize = 14.sp)
+                Text(notification.message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
