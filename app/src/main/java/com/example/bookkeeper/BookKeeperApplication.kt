@@ -1,8 +1,7 @@
 package com.example.bookkeeper
 
 import android.app.Application
-import androidx.work.* // Import do WorkManager
-import com.example.bookkeeper.data.BookDatabase
+import androidx.work.* import com.example.bookkeeper.data.BookDatabase
 import com.example.bookkeeper.data.BookRepository
 import com.example.bookkeeper.worker.ReminderWorker
 import java.util.concurrent.TimeUnit
@@ -14,7 +13,8 @@ class BookKeeperApplication : Application() {
         BookRepository(
             database.bookDao(),
             database.userDao(),
-            database.readingSessionDao()
+            database.readingSessionDao(),
+            database.noteDao() // <--- ADICIONADO: O novo DAO
         )
     }
 

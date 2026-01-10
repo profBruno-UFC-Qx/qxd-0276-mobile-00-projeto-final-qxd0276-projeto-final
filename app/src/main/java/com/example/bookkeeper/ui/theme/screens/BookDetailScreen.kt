@@ -3,29 +3,31 @@ package com.example.bookkeeper.ui.theme.screens
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -37,16 +39,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
+import com.example.bookkeeper.BabyPink
+import com.example.bookkeeper.DarkGrey
+import com.example.bookkeeper.LightPinkBg
+import com.example.bookkeeper.SoftRose
+import com.example.bookkeeper.White
 import com.example.bookkeeper.model.Book
+import com.example.bookkeeper.model.Note
 import com.example.bookkeeper.model.ReadingSession
-import com.example.bookkeeper.ui.theme.GoldAccent
 import com.example.bookkeeper.viewmodel.BookViewModel
-import com.example.bookkeeper.ui.theme.components.ReadingTimer
-import com.example.bookkeeper.ui.theme.components.SaveSessionDialog
-import kotlinx.coroutines.launch // Essencial para corrigir o erro
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookDetailScreen(viewModel: BookViewModel, bookId: Int, onBackClick: () -> Unit) {
     val books by viewModel.books.collectAsState()
@@ -60,193 +64,266 @@ fun BookDetailScreen(viewModel: BookViewModel, bookId: Int, onBackClick: () -> U
     var showEditDialog by remember { mutableStateOf(false) }
     val currentBook = books.getOrNull(pagerState.currentPage)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Detalhes", fontFamily = FontFamily.Serif) },
-                navigationIcon = { IconButton(onClick = onBackClick) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar") } },
-                actions = { IconButton(onClick = { showEditDialog = true }) { Icon(Icons.Rounded.Edit, "Editar") } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = MaterialTheme.colorScheme.onPrimary, navigationIconContentColor = MaterialTheme.colorScheme.onPrimary, actionIconContentColor = MaterialTheme.colorScheme.onPrimary)
-            )
+    Box(modifier = Modifier.fillMaxSize().background(White)) {
+        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { pageIndex ->
+            val book = books.getOrNull(pageIndex)
+            if (book != null) {
+                BookDetailDesignSkoob(
+                    book = book,
+                    viewModel = viewModel,
+                    onEditClick = { showEditDialog = true }
+                )
+            }
         }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) { pageIndex ->
-                val book = books.getOrNull(pageIndex)
-                if (book != null) BookDetailContent(book = book, viewModel = viewModel)
-            }
-            if (showEditDialog && currentBook != null) {
-                EditBookDialog(book = currentBook, viewModel = viewModel, onDismiss = { showEditDialog = false })
-            }
+
+        // Botão Voltar (Fixo no topo)
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier
+                .padding(top = 40.dp, start = 16.dp)
+                .align(Alignment.TopStart)
+                .background(Color.Black.copy(alpha = 0.3f), CircleShape)
+        ) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar", tint = White)
+        }
+
+        if (showEditDialog && currentBook != null) {
+            EditBookDialog(
+                book = currentBook,
+                viewModel = viewModel,
+                onDismiss = { showEditDialog = false },
+                onDelete = {
+                    showEditDialog = false
+                    onBackClick()
+                }
+            )
         }
     }
 }
 
 @Composable
-fun BookDetailContent(book: Book, viewModel: BookViewModel) {
+fun BookDetailDesignSkoob(
+    book: Book,
+    viewModel: BookViewModel,
+    onEditClick: () -> Unit
+) {
+    val scrollState = rememberScrollState()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Sinopse", "Notas", "Histórico")
-    val context = LocalContext.current
-    val elapsedTime by viewModel.elapsedTimeSeconds.collectAsState()
-    val isTimerRunning by viewModel.isTimerRunning.collectAsState()
-    val showSessionDialog by viewModel.showSaveSessionDialog.collectAsState()
-    var currentPageInput by remember(book.id, book.currentPage) { mutableStateOf(book.currentPage.toString()) }
-    val progressFraction = remember(book.currentPage, book.totalPages) { if (book.totalPages > 0) book.currentPage.toFloat() / book.totalPages.toFloat() else 0f }
-    val progressPercent = (progressFraction * 100).toInt()
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.fillMaxWidth().height(300.dp).background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
-            Card(elevation = CardDefaults.cardElevation(12.dp), shape = RoundedCornerShape(8.dp), modifier = Modifier.height(220.dp).width(150.dp)) {
-                if (book.coverUrl != null) AsyncImage(model = book.coverUrl, contentDescription = "Capa", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                else Box(modifier = Modifier.fillMaxSize().background(Color(book.coverColorHex ?: 0xFF888888)), contentAlignment = Alignment.Center) { Text("Sem Capa", color = Color.White) }
-            }
-        }
-        Spacer(Modifier.height(16.dp))
-        Text(book.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Serif, textAlign = TextAlign.Center, lineHeight = 26.sp, modifier = Modifier.padding(horizontal = 16.dp))
-        Text(book.author, fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(top = 4.dp, bottom = 16.dp))
-        Surface(color = GoldAccent.copy(alpha = 0.2f), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(1.dp, GoldAccent)) {
-            Text(book.status.uppercase(), modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-        }
-        Spacer(Modifier.height(24.dp))
-
-        if (book.status == "Lendo") {
-            ReadingTimer(elapsedSeconds = elapsedTime, isRunning = isTimerRunning, onToggle = { viewModel.toggleTimer() })
-        } else if (book.status == "Quero Ler") {
-            Button(onClick = { viewModel.updateBook(book.copy(status = "Lendo")); Toast.makeText(context, "Boa leitura!", Toast.LENGTH_SHORT).show() }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), colors = ButtonDefaults.buttonColors(containerColor = GoldAccent)) {
-                Icon(Icons.Rounded.PlayArrow, null); Spacer(Modifier.width(8.dp)); Text("Começar Leitura", color = MaterialTheme.colorScheme.primary)
-            }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 1. FUNDO DESFOCADO (Permanece Fixo)
+        if (book.coverUrl != null) {
+            AsyncImage(
+                model = book.coverUrl, contentDescription = null, contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().height(350.dp).blur(radius = 20.dp)
+            )
+            Box(modifier = Modifier.fillMaxWidth().height(350.dp).background(Color.Black.copy(alpha = 0.4f)))
+        } else {
+            Box(modifier = Modifier.fillMaxWidth().height(350.dp).background(Brush.verticalGradient(listOf(BabyPink, SoftRose))))
         }
 
-        Spacer(Modifier.height(16.dp))
-        Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))) {
-            Column(Modifier.padding(16.dp)) {
-                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) { Text("Progresso", fontWeight = FontWeight.Bold); Text("$progressPercent%", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) }
-                LinearProgressIndicator(progress = { progressFraction }, modifier = Modifier.fillMaxWidth().height(10.dp).padding(vertical = 4.dp), color = GoldAccent, trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                Spacer(Modifier.height(12.dp))
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(value = currentPageInput, onValueChange = { if (it.all { c -> c.isDigit() }) currentPageInput = it }, label = { Text("Pág.") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                    Text("/ ${book.totalPages}", fontWeight = FontWeight.Bold)
-                    FilledIconButton(onClick = {
-                        val newPage = currentPageInput.toIntOrNull() ?: 0
-                        val validPage = newPage.coerceIn(0, book.totalPages)
-                        viewModel.updateBook(book.copy(currentPage = validPage))
-                        Toast.makeText(context, "Atualizado!", Toast.LENGTH_SHORT).show()
-                    }) { Icon(Icons.Rounded.Check, "Salvar") }
+        // 2. ÁREA DE ROLAGEM (Contém a Capa Nítida e o Cartão Branco juntos)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
+            // Espaço transparente no topo para ver o fundo
+            Spacer(modifier = Modifier.height(100.dp))
+
+            // Box que sobrepõe a Capa e o Fundo Branco
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                // CAMADA DE TRÁS: O Cartão Branco com o Texto
+                Column(
+                    modifier = Modifier
+                        .padding(top = 110.dp) // Empurra para baixo para a capa ficar "em cima" da borda
+                        .fillMaxWidth()
+                        .background(White, RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                        .padding(bottom = 50.dp)
+                ) {
+                    // Espaço interno para a metade de baixo da capa não tapar o texto
+                    Spacer(modifier = Modifier.height(150.dp))
+
+                    // --- CONTEÚDO DO LIVRO ---
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+                        Text(text = book.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Serif, textAlign = TextAlign.Center, color = DarkGrey)
+                        Text(text = book.author, fontSize = 16.sp, color = Color.Gray, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 8.dp))
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        StatItem(value = "${book.currentPage}", label = "Lidas")
+                        VerticalDivider(modifier = Modifier.height(30.dp), color = Color.LightGray)
+                        StatItem(value = "${book.totalPages}", label = "Total")
+                        VerticalDivider(modifier = Modifier.height(30.dp), color = Color.LightGray)
+                        StatItem(value = book.status, label = "Status")
+                    }
+
+                    val progress = if (book.totalPages > 0) book.currentPage.toFloat() / book.totalPages.toFloat() else 0f
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp, vertical = 24.dp).height(8.dp).clip(RoundedCornerShape(4.dp)),
+                        color = SoftRose, trackColor = LightPinkBg
+                    )
+
+                    UpdatePageQuickAction(book, viewModel)
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                    HorizontalDivider(color = LightPinkBg, thickness = 8.dp)
+
+                    TabRow(
+                        selectedTabIndex = selectedTabIndex, containerColor = White,
+                        indicator = { TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(it[selectedTabIndex]), color = SoftRose) },
+                        divider = {}
+                    ) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(selected = selectedTabIndex == index, onClick = { selectedTabIndex = index }, text = { Text(title, color = if (selectedTabIndex == index) SoftRose else Color.Gray, fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal) })
+                        }
+                    }
+
+                    when (selectedTabIndex) {
+                        0 -> Column(Modifier.padding(24.dp)) { Text(text = if (book.review.isNotBlank()) book.review else "Nenhuma sinopse adicionada.", textAlign = TextAlign.Justify, color = DarkGrey, fontSize = 14.sp, lineHeight = 22.sp) }
+                        1 -> UserNotesTab(book, viewModel)
+                        2 -> { val sessions by viewModel.getBookSessions(book.id).collectAsState(initial = emptyList()); ReadingHistoryTab(sessions) }
+                    }
+                }
+
+                // CAMADA DA FRENTE: A Capa Nítida e o FAB (Agora rolam junto)
+                Box {
+                    Card(
+                        elevation = CardDefaults.cardElevation(12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.width(150.dp).height(230.dp)
+                    ) {
+                        if (book.coverUrl != null) {
+                            AsyncImage(model = book.coverUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                        } else {
+                            Box(Modifier.fillMaxSize().background(BabyPink), Alignment.Center) { Icon(Icons.Rounded.Add, null, tint = White, modifier = Modifier.size(40.dp)) }
+                        }
+                    }
+
+                    FloatingActionButton(
+                        onClick = onEditClick,
+                        containerColor = SoftRose, contentColor = White, shape = CircleShape,
+                        modifier = Modifier.align(Alignment.BottomEnd).offset(x = 25.dp, y = 10.dp).size(56.dp)
+                    ) {
+                        Icon(Icons.Rounded.Edit, "Editar", modifier = Modifier.size(28.dp))
+                    }
                 }
             }
         }
-        Spacer(Modifier.height(24.dp))
-        TabRow(selectedTabIndex = selectedTabIndex, containerColor = MaterialTheme.colorScheme.background, indicator = { TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(it[selectedTabIndex]), color = GoldAccent) }) {
-            tabs.forEachIndexed { index, title -> Tab(selected = selectedTabIndex == index, onClick = { selectedTabIndex = index }, text = { Text(title, fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal) }) }
-        }
-        when (selectedTabIndex) {
-            0 -> Column(Modifier.padding(24.dp)) { Text(if (book.review.isNotBlank()) book.review else "Sem sinopse.", textAlign = TextAlign.Justify) }
-            1 -> UserNotesTab(book, viewModel)
-            2 -> { val sessions by viewModel.getBookSessions(book.id).collectAsState(initial = emptyList()); ReadingHistoryTab(sessions) }
-        }
-        Spacer(Modifier.height(50.dp))
     }
-    SaveSessionDialog(show = showSessionDialog, onDismiss = { viewModel.dismissSessionDialog() }, onConfirm = { viewModel.confirmSaveSession(book.id) }, inputValue = viewModel.pagesReadInput, onInputChange = { viewModel.pagesReadInput = it })
+}
+
+// --- FUNÇÕES AUXILIARES (StatItem, UpdatePageQuickAction, Tabs, Dialogs) ---
+// Mantive as mesmas do código anterior, pois não precisam de alteração.
+
+@Composable
+fun StatItem(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DarkGrey)
+        Text(text = label, fontSize = 12.sp, color = Color.Gray)
+    }
 }
 
 @Composable
-fun ReadingHistoryTab(sessions: List<ReadingSession>) {
-    if (sessions.isEmpty()) Box(Modifier.fillMaxWidth().padding(40.dp), Alignment.Center) { Text("Nenhuma sessão registrada.", color = Color.Gray) }
-    else Column(Modifier.padding(16.dp)) { sessions.forEach { HistoryItem(it); Spacer(Modifier.height(8.dp)) } }
+fun UpdatePageQuickAction(book: Book, viewModel: BookViewModel) {
+    var currentPageInput by remember(book.currentPage) { mutableStateOf("") }
+    val context = LocalContext.current
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+        Text("Atualizar leitura:", fontSize = 12.sp, color = Color.Gray); Spacer(Modifier.width(8.dp))
+        OutlinedTextField(value = currentPageInput, onValueChange = { if (it.all { c -> c.isDigit() }) currentPageInput = it }, placeholder = { Text("${book.currentPage}") }, modifier = Modifier.width(70.dp).height(48.dp), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BabyPink, unfocusedBorderColor = Color.LightGray), singleLine = true)
+        IconButton(onClick = { val newPage = currentPageInput.toIntOrNull(); if (newPage != null) { val validPage = newPage.coerceIn(0, book.totalPages); viewModel.updateBook(book.copy(currentPage = validPage)); currentPageInput = ""; Toast.makeText(context, "Página atualizada!", Toast.LENGTH_SHORT).show() } }) { Icon(Icons.Rounded.Check, "Salvar", tint = SoftRose) }
+    }
 }
+
+@Composable
+fun ReadingHistoryTab(sessions: List<ReadingSession>) { if (sessions.isEmpty()) Box(Modifier.fillMaxWidth().padding(40.dp), Alignment.Center) { Text("Nenhuma sessão registrada.", color = Color.Gray) } else Column(Modifier.padding(16.dp)) { sessions.forEach { HistoryItem(it); Spacer(Modifier.height(8.dp)) } } }
 
 @Composable
 fun HistoryItem(session: ReadingSession) {
-    val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
-    val dateString = dateFormat.format(java.util.Date(session.endTime))
+    val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
     val durationText = if (session.durationSeconds / 60 > 0) "${session.durationSeconds / 60} min" else "${session.durationSeconds} s"
-    Card(elevation = CardDefaults.cardElevation(2.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        Row(Modifier.padding(16.dp).fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-            Column { Text(dateString, style = MaterialTheme.typography.bodySmall, color = Color.Gray); Text("+ ${session.pagesRead} pág", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) }
-            Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(16.dp)) { Text(durationText, Modifier.padding(8.dp, 4.dp), style = MaterialTheme.typography.labelSmall) }
+    Card(elevation = CardDefaults.cardElevation(0.dp), colors = CardDefaults.cardColors(containerColor = LightPinkBg), shape = RoundedCornerShape(12.dp)) {
+        Row(Modifier.padding(12.dp).fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            Column { Text(dateFormat.format(java.util.Date(session.endTime)), style = MaterialTheme.typography.labelSmall, color = Color.Gray); Text("+ ${session.pagesRead} páginas", fontWeight = FontWeight.Bold, color = SoftRose, fontSize = 14.sp) }
+            Surface(color = White, shape = RoundedCornerShape(8.dp)) { Text(durationText, Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.labelSmall, color = DarkGrey) }
         }
     }
 }
 
 @Composable
 fun UserNotesTab(book: Book, viewModel: BookViewModel) {
-    var notes by remember(book.id) { mutableStateOf(book.userNotes) }
-    Column(Modifier.padding(24.dp)) {
-        OutlinedTextField(value = notes, onValueChange = { notes = it }, modifier = Modifier.fillMaxWidth().height(250.dp), placeholder = { Text("Anotações...") }, shape = RoundedCornerShape(12.dp))
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = { viewModel.updateBookNotes(book, notes) }, Modifier.align(Alignment.End), enabled = notes != book.userNotes) { Icon(Icons.Rounded.Save, null); Spacer(Modifier.width(8.dp)); Text("Salvar") }
+    val notesList by viewModel.getBookNotes(book.id).collectAsState(initial = emptyList())
+    var showNoteDialog by remember { mutableStateOf(false) }
+    var currentNoteToEdit by remember { mutableStateOf<Note?>(null) }
+    Column(modifier = Modifier.padding(16.dp)) {
+        Button(onClick = { currentNoteToEdit = null; showNoteDialog = true }, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), colors = ButtonDefaults.buttonColors(containerColor = BabyPink)) { Icon(Icons.Rounded.Add, null); Spacer(Modifier.width(8.dp)); Text("Nova Anotação") }
+        if (notesList.isEmpty()) Box(Modifier.fillMaxWidth().height(80.dp), Alignment.Center) { Text("Nenhuma anotação.", color = Color.Gray) } else Column(modifier = Modifier.fillMaxWidth()) { notesList.forEach { note -> NoteItemCard(note = note, onEdit = { currentNoteToEdit = note; showNoteDialog = true }, onDelete = { viewModel.deleteNote(note) }); Spacer(modifier = Modifier.height(12.dp)) } }
     }
+    if (showNoteDialog) NoteInputDialog(initialContent = currentNoteToEdit?.content ?: "", onDismiss = { showNoteDialog = false }, onConfirm = { content -> viewModel.saveNote(bookId = book.id, content = content, noteId = currentNoteToEdit?.id ?: 0); showNoteDialog = false })
+}
+
+@Composable
+fun NoteItemCard(note: Note, onEdit: () -> Unit, onDelete: () -> Unit) {
+    val dateFormat = java.text.SimpleDateFormat("dd/MM 'às' HH:mm", java.util.Locale.getDefault())
+    Card(elevation = CardDefaults.cardElevation(0.dp), colors = CardDefaults.cardColors(containerColor = LightPinkBg), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(text = dateFormat.format(java.util.Date(note.timestamp)), style = MaterialTheme.typography.labelSmall, color = SoftRose, fontWeight = FontWeight.Bold)
+                Row { IconButton(onClick = onEdit, modifier = Modifier.size(24.dp)) { Icon(Icons.Rounded.Edit, "Editar", tint = BabyPink) }; IconButton(onClick = onDelete, modifier = Modifier.size(24.dp)) { Icon(Icons.Rounded.Delete, "Excluir", tint = Color.Red.copy(0.4f)) } }
+            }
+            Spacer(modifier = Modifier.height(4.dp)); Text(text = note.content, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Start, color = DarkGrey)
+        }
+    }
+}
+
+@Composable
+fun NoteInputDialog(initialContent: String, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    var text by remember { mutableStateOf(initialContent) }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(if (initialContent.isEmpty()) "Nova Anotação" else "Editar Anotação", color = SoftRose) }, text = { OutlinedTextField(value = text, onValueChange = { text = it }, modifier = Modifier.fillMaxWidth().height(150.dp), placeholder = { Text("Escreva aqui...") }, shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BabyPink, cursorColor = SoftRose)) }, confirmButton = { Button(onClick = { if (text.isNotBlank()) onConfirm(text) }, colors = ButtonDefaults.buttonColors(containerColor = BabyPink)) { Text("Salvar") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar", color = Color.Gray) } }, containerColor = White)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditBookDialog(book: Book, viewModel: BookViewModel, onDismiss: () -> Unit) {
+fun EditBookDialog(book: Book, viewModel: BookViewModel, onDismiss: () -> Unit, onDelete: () -> Unit) {
     var title by remember { mutableStateOf(book.title) }
     var author by remember { mutableStateOf(book.author) }
     var totalPages by remember { mutableStateOf(book.totalPages.toString()) }
     var selectedStatus by remember { mutableStateOf(book.status) }
     var currentCoverPath by remember { mutableStateOf(book.coverUrl) }
     var showImageSourceDialog by remember { mutableStateOf(false) }
-
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) scope.launch { currentCoverPath = viewModel.saveImageToInternalStorage(uri) } }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap -> if (bitmap != null) scope.launch { currentCoverPath = viewModel.saveBitmapToInternalStorage(bitmap) } }
 
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            scope.launch {
-                currentCoverPath = viewModel.saveImageToInternalStorage(uri)
-            }
-        }
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) {
-            scope.launch {
-                currentCoverPath = viewModel.saveBitmapToInternalStorage(bitmap)
-            }
-        }
-    }
-
-    if (showImageSourceDialog) {
-        AlertDialog(
-            onDismissRequest = { showImageSourceDialog = false },
-            title = { Text("Alterar Capa") },
-            confirmButton = { TextButton(onClick = { showImageSourceDialog = false; cameraLauncher.launch(null) }) { Text("Câmera") } },
-            dismissButton = { TextButton(onClick = { showImageSourceDialog = false; galleryLauncher.launch("image/*") }) { Text("Galeria") } }
-        )
-    }
+    if (showImageSourceDialog) AlertDialog(onDismissRequest = { showImageSourceDialog = false }, title = { Text("Alterar Capa") }, confirmButton = { TextButton(onClick = { showImageSourceDialog = false; cameraLauncher.launch(null) }) { Text("Câmera") } }, dismissButton = { TextButton(onClick = { showImageSourceDialog = false; galleryLauncher.launch("image/*") }) { Text("Galeria") } })
+    if (showDeleteConfirmation) AlertDialog(onDismissRequest = { showDeleteConfirmation = false }, title = { Text("Excluir Livro?") }, text = { Text("Tem certeza que deseja apagar '${book.title}'? Essa ação não pode ser desfeita.") }, confirmButton = { Button(onClick = { viewModel.deleteBook(book); showDeleteConfirmation = false; onDelete() }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("Sim, Excluir") } }, dismissButton = { TextButton(onClick = { showDeleteConfirmation = false }) { Text("Cancelar") } }, containerColor = White)
 
     Dialog(onDismissRequest = onDismiss) {
-        Card(modifier = Modifier.fillMaxWidth().padding(16.dp).verticalScroll(rememberScrollState()), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Card(modifier = Modifier.fillMaxWidth().padding(16.dp).verticalScroll(rememberScrollState()), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = White)) {
             Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Editar Livro", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(24.dp))
+                Text("Editar Livro", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = SoftRose); Spacer(Modifier.height(24.dp))
                 Box(contentAlignment = Alignment.BottomEnd) {
-                    Card(modifier = Modifier.height(180.dp).width(120.dp).clickable { showImageSourceDialog = true }) {
-                        if (currentCoverPath != null) AsyncImage(model = currentCoverPath, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                        else Box(Modifier.fillMaxSize().background(Color.LightGray), contentAlignment = Alignment.Center) { Icon(Icons.Default.AddPhotoAlternate, null) }
-                    }
-                    Surface(shape = RoundedCornerShape(4.dp), color = GoldAccent, modifier = Modifier.padding(4.dp)) { Icon(Icons.Rounded.Edit, null, modifier = Modifier.size(24.dp).padding(4.dp)) }
+                    Card(modifier = Modifier.height(180.dp).width(120.dp).clickable { showImageSourceDialog = true }) { if (currentCoverPath != null) AsyncImage(model = currentCoverPath, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) else Box(Modifier.fillMaxSize().background(LightPinkBg), contentAlignment = Alignment.Center) { Icon(Icons.Default.AddPhotoAlternate, null, tint = BabyPink) } }
+                    Surface(shape = RoundedCornerShape(4.dp), color = BabyPink, modifier = Modifier.padding(4.dp)) { Icon(Icons.Rounded.Edit, null, modifier = Modifier.size(24.dp).padding(4.dp), tint = White) }
                 }
                 Spacer(Modifier.height(24.dp))
-                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Título") }, modifier = Modifier.fillMaxWidth())
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(value = author, onValueChange = { author = it }, label = { Text("Autor") }, modifier = Modifier.fillMaxWidth())
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(value = totalPages, onValueChange = { totalPages = it }, label = { Text("Páginas") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Título") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BabyPink, focusedLabelColor = BabyPink)); Spacer(Modifier.height(12.dp))
+                OutlinedTextField(value = author, onValueChange = { author = it }, label = { Text("Autor") }, modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BabyPink, focusedLabelColor = BabyPink)); Spacer(Modifier.height(12.dp))
+                OutlinedTextField(value = totalPages, onValueChange = { totalPages = it }, label = { Text("Páginas") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BabyPink, focusedLabelColor = BabyPink))
                 Spacer(Modifier.height(24.dp))
-                val statusOptions = listOf("Quero Ler", "Lendo", "Lido")
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    statusOptions.forEach { status -> FilterChip(selected = selectedStatus == status, onClick = { selectedStatus = status }, label = { Text(status) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = GoldAccent)) }
-                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) { listOf("Quero Ler", "Lendo", "Lido").forEach { status -> FilterChip(selected = selectedStatus == status, onClick = { selectedStatus = status }, label = { Text(status) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = BabyPink, selectedLabelColor = White)) } }
                 Spacer(Modifier.height(32.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = onDismiss) { Text("Cancelar") }
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = {
-                        val updatedBook = book.copy(title = title, author = author, totalPages = totalPages.toIntOrNull() ?: 0, status = selectedStatus, coverUrl = currentCoverPath)
-                        viewModel.updateBook(updatedBook)
-                        onDismiss()
-                    }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) { Text("Salvar") }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { showDeleteConfirmation = true }) { Icon(Icons.Rounded.Delete, "Excluir", tint = Color.Red.copy(alpha = 0.6f)) }
+                    Row { TextButton(onClick = onDismiss) { Text("Cancelar", color = Color.Gray) }; Spacer(Modifier.width(8.dp)); Button(onClick = { val updatedBook = book.copy(title = title, author = author, totalPages = totalPages.toIntOrNull() ?: 0, status = selectedStatus, coverUrl = currentCoverPath); viewModel.updateBook(updatedBook); onDismiss() }, colors = ButtonDefaults.buttonColors(containerColor = BabyPink)) { Text("Salvar") } }
                 }
             }
         }

@@ -28,4 +28,7 @@ interface BookDao {
 
     @Query("SELECT COUNT(*) FROM books WHERE status = 'Lido'")
     fun getFinishedBooksCount(): Flow<Int>
+
+    @Query("SELECT COALESCE(SUM(currentPage), 0) FROM books WHERE userId = :userId")
+    fun getTotalPagesRead(userId: Int): Flow<Int>
 }
