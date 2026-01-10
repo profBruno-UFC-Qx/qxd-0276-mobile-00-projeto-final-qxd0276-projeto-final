@@ -3,6 +3,9 @@ package com.example.bookkeeper.viewmodel
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -13,18 +16,23 @@ import com.example.bookkeeper.BookKeeperApplication
 import com.example.bookkeeper.data.BookRepository
 import com.example.bookkeeper.data.api.RetrofitClient
 import com.example.bookkeeper.model.Book
+import com.example.bookkeeper.model.ReadingSession
 import com.example.bookkeeper.model.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BookViewModel(
     application: Application,
     private val repository: BookRepository
 ) : AndroidViewModel(application) {
 
+    // --- ESTADOS ---
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
@@ -36,223 +44,222 @@ class BookViewModel(
 
     private val prefs = application.getSharedPreferences("bookkeeper_prefs", Context.MODE_PRIVATE)
 
+    // --- CRONÔMETRO ---
+    private val _elapsedTimeSeconds = MutableStateFlow(0L)
+    val elapsedTimeSeconds: StateFlow<Long> = _elapsedTimeSeconds.asStateFlow()
+
+    private val _isTimerRunning = MutableStateFlow(false)
+    val isTimerRunning: StateFlow<Boolean> = _isTimerRunning.asStateFlow()
+
+    private var timerJob: Job? = null
+
+    // --- DIALOG ---
+    private val _showSaveSessionDialog = MutableStateFlow(false)
+    val showSaveSessionDialog: StateFlow<Boolean> = _showSaveSessionDialog.asStateFlow()
+    var pagesReadInput by mutableStateOf("")
+
     init {
         viewModelScope.launch {
             _isLoading.value = true
             val savedUserId = prefs.getInt("logged_user_id", -1)
             _isDarkTheme.value = prefs.getBoolean("dark_mode", false)
-
             if (savedUserId != -1) {
-                delay(2000)
+                delay(1000)
                 val user = repository.getUserById(savedUserId)
-                if (user != null) {
-                    _currentUser.value = user
-                }
-            } else {
-                delay(1500)
+                if (user != null) _currentUser.value = user
             }
             _isLoading.value = false
         }
     }
 
-    // A lista de livros "viva". Usaremos ela para checar duplicatas.
     @OptIn(ExperimentalCoroutinesApi::class)
     val books: StateFlow<List<Book>> = _currentUser.flatMapLatest { user ->
-        if (user != null) {
-            repository.getBooksForUser(user.id)
-        } else {
-            flowOf(emptyList())
-        }
+        if (user != null) repository.getBooksForUser(user.id) else flowOf(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // --- FUNÇÕES DE TIMER E SESSÃO ---
+    fun getBookSessions(bookId: Int) = repository.getSessionsForBook(bookId)
 
-    // --- BUSCAR E SALVAR (COM BLOQUEIO DE DUPLICATAS) ---
-    fun searchAndSaveBook(isbn: String, onSuccess: () -> Unit) {
-        val user = _currentUser.value
-        if (user == null) {
-            showToast("Erro: Você precisa estar logado.")
-            return
+    fun toggleTimer() {
+        if (_isTimerRunning.value) stopTimer() else startTimer()
+    }
+
+    private fun startTimer() {
+        if (_isTimerRunning.value) return
+        _isTimerRunning.value = true
+        timerJob = viewModelScope.launch {
+            while (isActive) {
+                delay(1000L)
+                _elapsedTimeSeconds.value += 1
+            }
         }
+    }
 
+    private fun stopTimer() {
+        _isTimerRunning.value = false
+        timerJob?.cancel()
+        _showSaveSessionDialog.value = true
+    }
+
+    fun dismissSessionDialog() { _showSaveSessionDialog.value = false }
+
+    fun confirmSaveSession(bookId: Int) {
+        val pagesRead = pagesReadInput.toIntOrNull() ?: 0
+        if (pagesRead > 0) {
+            saveReadingSession(bookId, pagesRead, _elapsedTimeSeconds.value)
+        } else {
+            showToast("Sessão descartada.")
+        }
+        pagesReadInput = ""
+        _elapsedTimeSeconds.value = 0
+        _showSaveSessionDialog.value = false
+    }
+
+    private fun saveReadingSession(bookId: Int, pages: Int, duration: Long) {
+        viewModelScope.launch {
+            repository.insertReadingSession(
+                ReadingSession(
+                    bookId = bookId,
+                    startTime = System.currentTimeMillis() - (duration * 1000),
+                    endTime = System.currentTimeMillis(),
+                    pagesRead = pages,
+                    durationSeconds = duration
+                )
+            )
+            val currentBook = books.value.find { it.id == bookId }
+            if (currentBook != null) {
+                val newPage = currentBook.currentPage + pages
+                val finalPage = if (newPage > currentBook.totalPages) currentBook.totalPages else newPage
+                val newStatus = if (finalPage == currentBook.totalPages) "Lido" else "Lendo"
+
+                repository.updateBook(currentBook.copy(currentPage = finalPage, status = newStatus))
+
+                if (newStatus == "Lido") showToast("Parabéns! Livro concluído!")
+            }
+            showToast("Sessão salva: +$pages páginas")
+        }
+    }
+
+    // --- API GOOGLE BOOKS (CORREÇÃO DE ERROS DE TIPO) ---
+    fun searchAndSaveBook(isbn: String, onSuccess: () -> Unit) {
+        val user = _currentUser.value ?: return showToast("Faça login primeiro.")
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 1. Busca na API
                 val response = RetrofitClient.api.searchBookByIsbn("isbn:$isbn")
                 val item = response.items?.firstOrNull()
 
+                // Tratamento seguro de nulos
                 if (item != null) {
-                    val info = item.volumeInfo // Pode ser nulo
-                    val titleFound = info?.title ?: "Título Desconhecido"
+                    val info = item.volumeInfo
+                    if (info != null) {
+                        val title = info.title ?: "Sem Título"
 
-                    // 2. VERIFICAÇÃO DE DUPLICIDADE 🛑
-                    // Olha na lista atual (books.value) se alguém tem esse título
-                    val jaExiste = books.value.any { livro ->
-                        livro.title.equals(titleFound, ignoreCase = true)
-                    }
-
-                    if (jaExiste) {
-                        showToast("Este livro já está na sua estante!")
-                        // Não faz nada (não salva)
+                        // Verifica duplicatas
+                        if (books.value.any { it.title.equals(title, true) }) {
+                            showToast("Livro já está na estante!")
+                        } else {
+                            val newBook = Book(
+                                title = title,
+                                author = info.authors?.joinToString(", ") ?: "Desconhecido",
+                                totalPages = info.pageCount ?: 0,
+                                currentPage = 0,
+                                status = "Quero Ler",
+                                review = info.description ?: "", // O erro de String? estava aqui
+                                userId = user.id,
+                                coverUrl = info.imageLinks?.thumbnail?.replace("http:", "https:")
+                            )
+                            repository.saveBook(newBook)
+                            showToast("Livro salvo!")
+                            onSuccess()
+                        }
                     } else {
-                        // 3. Se não existe, cria e salva
-                        val newBook = Book(
-                            title = titleFound,
-                            author = info?.authors?.joinToString(", ") ?: "Autor Desconhecido",
-                            totalPages = info?.pageCount ?: 0,
-                            currentPage = 0,
-                            status = "Quero Ler",
-                            review = info?.description ?: "",
-                            userId = user.id,
-                            coverUrl = info?.imageLinks?.thumbnail?.replace("http://", "https://")
-                        )
-
-                        repository.saveBook(newBook)
-                        showToast("Livro salvo na estante!")
-                        onSuccess()
+                        showToast("Informações do livro incompletas.")
                     }
-
                 } else {
-                    showToast("Google: Livro não encontrado.")
+                    showToast("Livro não encontrado.")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
-                showToast("Erro de conexão: ${e.message}")
+                showToast("Erro: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    private fun showToast(msg: String) {
-        viewModelScope.launch(Dispatchers.Main) {
-            Toast.makeText(getApplication(), msg, Toast.LENGTH_LONG).show()
+    // --- SALVAR IMAGEM (SUSPEND) ---
+    suspend fun saveImageToInternalStorage(uri: android.net.Uri): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val context = getApplication<Application>().applicationContext
+                val fileName = "cover_${System.currentTimeMillis()}.jpg"
+                val file = java.io.File(context.filesDir, fileName)
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    java.io.FileOutputStream(file).use { output -> input.copyTo(output) }
+                }
+                file.absolutePath
+            } catch (e: Exception) { null }
         }
     }
 
-    // --- LOGIN / CADASTRO / LOGOUT ---
-
-    fun login(email: String, pass: String, onResult: (Boolean) -> Unit) {
-        if (email.isBlank() || pass.isBlank()) { onResult(false); return }
-        viewModelScope.launch {
-            _isLoading.value = true
-            delay(1500)
-            val user = repository.login(email, pass)
-            if (user != null) {
-                _currentUser.value = user
-                saveLoginState(user.id)
-                onResult(true)
-            } else { onResult(false) }
-            _isLoading.value = false
+    suspend fun saveBitmapToInternalStorage(bitmap: android.graphics.Bitmap): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val context = getApplication<Application>().applicationContext
+                val fileName = "cam_${System.currentTimeMillis()}.jpg"
+                val file = java.io.File(context.filesDir, fileName)
+                java.io.FileOutputStream(file).use { output ->
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, output)
+                }
+                file.absolutePath
+            } catch (e: Exception) { null }
         }
     }
 
-    fun register(name: String, email: String, pass: String, onResult: (Boolean) -> Unit) {
-        if (name.isBlank() || email.isBlank() || pass.isBlank()) { onResult(false); return }
-        viewModelScope.launch {
-            _isLoading.value = true
-            delay(1500)
-            if (repository.getUserByEmail(email) != null) {
-                _isLoading.value = false
-                onResult(false)
-            } else {
-                val newUser = User(name = name, email = email, password = pass)
-                val registeredUser = repository.registerUser(newUser)
-                if (registeredUser != null) {
-                    _currentUser.value = registeredUser
-                    saveLoginState(registeredUser.id)
-                    onResult(true)
-                } else { onResult(false) }
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun logout() {
-        _currentUser.value = null
-        prefs.edit().clear().apply()
-    }
-
-    fun deleteAccount(onResult: () -> Unit) {
-        val user = _currentUser.value ?: return
-        viewModelScope.launch {
-            _isLoading.value = true
-            repository.deleteUser(user)
-            logout()
-            onResult()
-            _isLoading.value = false
-        }
-    }
-
-    private fun saveLoginState(userId: Int) {
-        prefs.edit().putInt("logged_user_id", userId).apply()
-    }
-
-    fun toggleTheme() {
-        val newSetting = !_isDarkTheme.value
-        _isDarkTheme.value = newSetting
-        prefs.edit().putBoolean("dark_mode", newSetting).apply()
-    }
-
-    fun updateUserProfile(newName: String, newBio: String, newEmail: String, newPass: String, imageUri: String?) {
-        viewModelScope.launch {
-            val user = _currentUser.value ?: return@launch
-            val updatedUser = user.copy(name = newName, bio = newBio, email = newEmail, password = newPass, profilePictureUri = imageUri)
-            repository.updateUser(updatedUser)
-            _currentUser.value = updatedUser
-        }
-    }
-
-    // --- CRUD MANUAL (Sem validação de duplicata, caso o usuário queira forçar) ---
+    // --- CRUD ---
     fun saveBook(book: Book) {
         val user = _currentUser.value ?: return
+        viewModelScope.launch { repository.saveBook(book.copy(userId = user.id)) }
+    }
+    fun updateBook(book: Book) { viewModelScope.launch { repository.updateBook(book) } }
+    fun deleteBook(book: Book) { viewModelScope.launch { repository.deleteBook(book) } }
+    fun updateBookNotes(book: Book, notes: String) {
+        viewModelScope.launch { repository.updateBook(book.copy(userNotes = notes)) }
+    }
+
+    // --- AUTH ---
+    fun login(e: String, p: String, r: (Boolean) -> Unit) {
         viewModelScope.launch {
-            _isLoading.value = true
-            repository.saveBook(book.copy(userId = user.id))
-            _isLoading.value = false
+            val u = repository.login(e, p)
+            if (u != null) { _currentUser.value = u; prefs.edit().putInt("logged_user_id", u.id).apply(); r(true) }
+            else r(false)
+        }
+    }
+    fun register(n: String, e: String, p: String, r: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            if (repository.getUserByEmail(e) == null) {
+                val u = repository.registerUser(User(name=n, email=e, password=p))
+                if (u != null) { _currentUser.value = u; prefs.edit().putInt("logged_user_id", u.id).apply(); r(true) }
+                else r(false)
+            } else r(false)
+        }
+    }
+    fun logout() { _currentUser.value = null; prefs.edit().clear().apply() }
+    fun deleteAccount(r: () -> Unit) { viewModelScope.launch { _currentUser.value?.let { repository.deleteUser(it) }; logout(); r() } }
+    fun toggleTheme() { _isDarkTheme.value = !_isDarkTheme.value; prefs.edit().putBoolean("dark_mode", _isDarkTheme.value).apply() }
+    fun updateUserProfile(n: String, b: String, e: String, p: String, i: String?) {
+        viewModelScope.launch {
+            _currentUser.value?.let {
+                val newU = it.copy(name=n, bio=b, email=e, password=p, profilePictureUri=i)
+                repository.updateUser(newU)
+                _currentUser.value = newU
+            }
         }
     }
 
-    fun deleteBook(book: Book) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            repository.deleteBook(book)
-            _isLoading.value = false
-        }
-    }
-
-    // --- ARQUIVOS / IMAGENS ---
-    fun saveImageToInternalStorage(uri: android.net.Uri): String? {
-        val context = getApplication<Application>().applicationContext
-        try {
-            val fileName = "cover_${System.currentTimeMillis()}.jpg"
-            val file = java.io.File(context.filesDir, fileName)
-            context.contentResolver.openInputStream(uri)?.use { input ->
-                java.io.FileOutputStream(file).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            return file.absolutePath
-        } catch (e: Exception) { e.printStackTrace(); return null }
-    }
-
-    fun saveBitmapToInternalStorage(bitmap: android.graphics.Bitmap): String? {
-        val context = getApplication<Application>().applicationContext
-        try {
-            val fileName = "camera_${System.currentTimeMillis()}.jpg"
-            val file = java.io.File(context.filesDir, fileName)
-            java.io.FileOutputStream(file).use { output ->
-                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 100, output)
-            }
-            return file.absolutePath
-        } catch (e: Exception) { e.printStackTrace(); return null }
-    }
-    fun updateBookNotes(book: Book, newNotes: String) {
-        val user = _currentUser.value ?: return
-        viewModelScope.launch {
-            _isLoading.value = true
-            repository.updateBook(book.copy(userNotes = newNotes))
-            _isLoading.value = false
+    private fun showToast(msg: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show()
         }
     }
 
