@@ -16,9 +16,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.FlashAuto
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.filled.GridOff
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,8 +71,8 @@ fun CameraOptionsMenu(
 
     Row(
         modifier = modifier
-            .padding(end = 30.dp, bottom = 110.dp)
-            .background(shape = CircleShape, color = Color.Black.copy(alpha = 0.5f)).padding(10.dp)
+            .padding(end = 25.dp, bottom = 115.dp)
+            .background(shape = CircleShape, color = Color.Black.copy(alpha = 0.3f)).padding(8.dp)
     ) {
         AnimatedVisibility(
             visible = expanded
@@ -138,7 +136,7 @@ fun CameraOptionsMenu(
             }
         }
         Icon(
-            imageVector = if (expanded) Icons.Default.Close else Icons.Default.Apps,
+            imageVector = if (expanded) Icons.Default.Close else Icons.Default.Dashboard,
             contentDescription = "Camera dashboard button",
             modifier = modifier
                 .clickable { expanded = !expanded }

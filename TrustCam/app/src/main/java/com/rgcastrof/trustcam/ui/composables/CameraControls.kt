@@ -53,7 +53,7 @@ fun CameraControls(
     ) {
         IconButton(
             onClick = onOpenGallery,
-            modifier = Modifier.padding(42.dp)
+            modifier = Modifier.padding(42.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.3f))
         ) {
             if (lastTakenPhoto != null) {
                 AsyncImage(
@@ -81,7 +81,7 @@ fun CameraControls(
 
         IconButton(
             onClick = onSwitchCamera,
-            modifier = Modifier.padding(42.dp)
+            modifier = Modifier.padding(42.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.3f))
         ) {
             Icon(
                 imageVector = Icons.Default.FlipCameraAndroid,
