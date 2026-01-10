@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import com.rgcastrof.trustcam.data.location.LocationListener
 import com.rgcastrof.trustcam.ui.composables.CameraControls
@@ -105,7 +104,8 @@ fun CameraScreen(
                 )
             },
             onSwitchCamera = onSwitchCamera,
-            lastTakenPhoto = uiState.lastTakenPhoto
+            lastTakenPhoto = uiState.lastTakenPhoto,
+            cameraSelector = uiState.cameraSelector
         )
     }
 }
