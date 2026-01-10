@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,7 +90,7 @@ fun PhotoDetailOverlay(
             )
 
             ButtonWithIconAndLabel(
-                icon = Icons.Default.DeleteOutline,
+                icon = Icons.Default.Delete,
                 contentDescription = "Delete the photo",
                 label = "Delete",
                 onClick = {

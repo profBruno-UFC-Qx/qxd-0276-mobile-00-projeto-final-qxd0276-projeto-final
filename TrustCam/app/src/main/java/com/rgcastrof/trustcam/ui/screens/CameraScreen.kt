@@ -46,16 +46,9 @@ fun CameraScreen(
         onDispose { mediaActionSound.release() }
     }
 
-    val controller = remember(uiState.aspectRatio) {
-        val resolutionSelector = ResolutionSelector.Builder()
-            .setAspectRatioStrategy(uiState.aspectRatio)
-            .build()
+    val controller = remember(context) {
         LifecycleCameraController(context).apply {
-            setEnabledUseCases(
-                CameraController.IMAGE_CAPTURE
-            )
-            previewResolutionSelector = resolutionSelector
-            imageCaptureResolutionSelector = resolutionSelector
+            setEnabledUseCases(CameraController.IMAGE_CAPTURE)
         }
     }
 
@@ -67,19 +60,25 @@ fun CameraScreen(
         controller.imageCaptureFlashMode = uiState.flashMode
     }
 
+    LaunchedEffect(uiState.aspectRatio) {
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(uiState.aspectRatio)
+            .build()
+        controller.previewResolutionSelector = resolutionSelector
+        controller.imageCaptureResolutionSelector = resolutionSelector
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
     ) {
-        key(uiState.aspectRatio) {
-            CameraPreview(
-                controller = controller,
-                modifier = Modifier.fillMaxSize(),
-                gridState = uiState.gridStateOn,
-                aspectRatio = uiState.aspectRatio,
-            )
-        }
+        CameraPreview(
+            controller = controller,
+            modifier = Modifier.fillMaxSize(),
+            gridState = uiState.gridStateOn,
+            aspectRatio = uiState.aspectRatio,
+        )
 
         CameraOptionsMenu(
             uiState = uiState,
