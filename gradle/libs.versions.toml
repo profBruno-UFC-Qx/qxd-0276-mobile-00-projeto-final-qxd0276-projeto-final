@@ -22,6 +22,7 @@ googleMapsServices = "18.2.0"
 googlePlaces = "3.4.0"
 #Navigation
 navigation = "2.9.6"
+material3 = "1.4.0"
 
 [libraries]
 # --- CORE & LIFECYCLE ---
@@ -70,6 +71,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 
 [plugins]

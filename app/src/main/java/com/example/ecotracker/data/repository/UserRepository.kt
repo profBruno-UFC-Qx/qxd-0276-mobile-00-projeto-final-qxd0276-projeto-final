@@ -18,7 +18,7 @@ class UserRepository(
     private val userDao: UserDao
 ) {
     // Crud
-    suspend fun insertUser(user: User): Result<Unit> {
+    suspend fun registerUser(user: User): Result<Unit> {
         return try {
             userDao.insertUser(user)
             Result.success(Unit)
@@ -40,22 +40,9 @@ class UserRepository(
             Result.failure(UserError.DatabaseError)
         }
     }
-    suspend fun deleteUser(user: User): Result<Unit> {
+    suspend fun logOutUser(): Result<Unit> {
         return try {
-            val row = userDao.deleteUser(user)
-            // Valor diferente de 0 sucesso na operação, caso contrário erro
-            if(row == 0) {
-                Result.failure(UserError.UserNotFound)
-            }
-            else Result.success(Unit)
-        }
-        catch (e: Exception){
-            Result.failure(UserError.DatabaseError)
-        }
-    }
-    suspend fun deleteUserById(id: Long): Result<Unit> {
-        return try {
-            val row = userDao.deleteUserByID(id)
+            val row = userDao.logOut()
             // Valor diferente de 0 sucesso na operação, caso contrário erro
             if(row == 0) {
                 Result.failure(UserError.UserNotFound)
@@ -68,8 +55,8 @@ class UserRepository(
     }
 
     // Querys
-    fun getUserById(id: Long): Flow<User?> {
-        return userDao.getUserById(id)
+    fun getLoggedUser(): Flow<User?> {
+        return userDao.getLoggedUser()
             .catch { exception ->
                 emit(null)
             }
@@ -90,16 +77,6 @@ class UserRepository(
                 emit(null)
             }
 
-    }
-
-    fun getAllUsers(): Flow<PagingData<User>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { userDao.getAllUsers() }
-        ).flow
     }
 
 }

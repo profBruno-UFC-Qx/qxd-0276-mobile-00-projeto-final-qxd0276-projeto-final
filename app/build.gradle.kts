@@ -85,6 +85,7 @@ dependencies {
     // --- Room (Banco de Dados) ---
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.compose.material3)
     ksp(libs.androidx.room.compiler)
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
