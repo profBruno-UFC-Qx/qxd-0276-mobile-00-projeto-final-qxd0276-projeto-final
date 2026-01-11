@@ -49,9 +49,8 @@ Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
 
 ```bash
 # Clone o repositório
-git clone [https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories](https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories)
 
-# Navegue para o diretório
-cd [nome-do-repositorio]
+git clone <https://github.com/profBruno-UFC-Qx/classroom-mobile-final-devdroids.git>
 
-# Siga as instruções específicas para a sua tecnologia...
+# Navegue até o diretório do projeto
+cd <classroom-mobile-final-devdroids>
