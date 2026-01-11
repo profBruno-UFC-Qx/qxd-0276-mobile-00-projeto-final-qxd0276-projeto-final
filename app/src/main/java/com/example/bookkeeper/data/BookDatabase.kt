@@ -15,7 +15,7 @@ import com.example.bookkeeper.model.Note // 2. Importe a nova Entidade
 
 @Database(
     entities = [Book::class, User::class, ReadingSession::class, Note::class],
-    version = 9, // 4. Aumente a versão (era 8) para forçar a atualização
+    version = 9,
     exportSchema = false
 )
 abstract class BookDatabase : RoomDatabase() {
@@ -24,7 +24,6 @@ abstract class BookDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun readingSessionDao(): ReadingSessionDao
 
-    // 5. Adicione essa função para o Room saber como acessar as notas
     abstract fun noteDao(): NoteDao
 
     companion object {
@@ -34,8 +33,6 @@ abstract class BookDatabase : RoomDatabase() {
         fun getDatabase(context: Context): BookDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, BookDatabase::class.java, "book_database")
-                    // CUIDADO: Isso apaga os dados antigos ao mudar a versão.
-                    // Para um app final, usa-se Migrations, mas para projeto acadêmico isso agiliza.
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }

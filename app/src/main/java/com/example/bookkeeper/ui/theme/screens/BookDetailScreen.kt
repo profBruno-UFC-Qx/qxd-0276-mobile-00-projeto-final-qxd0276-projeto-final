@@ -20,7 +20,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Share // IMPORTADO AQUI
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -161,7 +161,6 @@ fun BookDetailDesignSkoob(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // BOTÃO DE COMPARTILHAR ADICIONADO AQUI DENTRO DO DESIGN
                     Button(
                         onClick = {
                             val percent = if (book.totalPages > 0) (book.currentPage * 100 / book.totalPages) else 0
@@ -263,7 +262,6 @@ fun BookDetailDesignSkoob(
     }
 }
 
-// ... (Todas as outras funções auxiliares como StatItem, UpdatePageQuickAction, etc, permanecem as mesmas abaixo)
 
 @Composable
 fun StatItem(value: String, label: String) {

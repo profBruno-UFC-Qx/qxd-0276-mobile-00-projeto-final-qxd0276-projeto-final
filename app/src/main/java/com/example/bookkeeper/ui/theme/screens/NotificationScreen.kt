@@ -1,6 +1,5 @@
 package com.example.bookkeeper.ui.theme.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,12 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Dados de exemplo para preencher a tela
 data class DummyNotification(val id: Int, val title: String, val message: String, val time: String)
 
 val sampleNotifications = listOf(
@@ -45,7 +42,6 @@ fun NotificationScreen(onBackClick: () -> Unit) {
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (sampleNotifications.isEmpty()) {
-            // Estado Vazio
             Box(modifier = Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Rounded.Notifications, null, modifier = Modifier.size(60.dp), tint = MaterialTheme.colorScheme.outline)
@@ -54,7 +50,6 @@ fun NotificationScreen(onBackClick: () -> Unit) {
                 }
             }
         } else {
-            // Lista de Notificações
             LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),

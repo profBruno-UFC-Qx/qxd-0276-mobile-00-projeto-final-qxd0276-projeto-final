@@ -21,14 +21,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.bookkeeper.viewmodel.BookViewModel
 
@@ -155,7 +153,6 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                // Bio Card
                 if (!isEditing && tempBio.isNotBlank()) {
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
@@ -202,7 +199,6 @@ fun ProfileScreen(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // MODO ESCURO
                     Surface(
                         onClick = { viewModel.toggleTheme() },
                         shape = RoundedCornerShape(12.dp),

@@ -18,7 +18,6 @@ val Lato = FontFamily(
 )
 
 val Typography = Typography(
-    // TÍTULOS GRANDES (Display)
     displayLarge = TextStyle(
         fontFamily = Bellefair,
         fontWeight = FontWeight.Normal,

@@ -20,7 +20,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,7 +31,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -88,7 +86,6 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.width(300.dp),
                                     drawerContainerColor = MaterialTheme.colorScheme.surface
                                 ) {
-                                    // CABEÇALHO DO MENU LATERAL
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -142,7 +139,6 @@ class MainActivity : ComponentActivity() {
 
                                     Spacer(Modifier.height(12.dp))
 
-                                    // --- ITEM DE ESTATÍSTICAS NO MENU ---
                                     NavigationDrawerItem(
                                         label = { Text("Estatísticas") },
                                         icon = { Icon(Icons.Rounded.BarChart, null) },
@@ -193,7 +189,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) {
-                            // --- NAVEGAÇÃO PRINCIPAL ATUALIZADA ---
                             when (currentScreen) {
                                 "library" -> LibraryScreen(
                                     viewModel = viewModel,
@@ -243,8 +238,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-// O restante das funções LibraryScreen e BookCard seguem abaixo sem alterações...
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

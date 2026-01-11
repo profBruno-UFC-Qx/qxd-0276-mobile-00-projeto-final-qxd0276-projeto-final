@@ -1,16 +1,14 @@
 package com.example.bookkeeper.ui.theme.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Book
-import androidx.compose.material.icons.rounded.Notifications // Import do ícone
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,12 +28,11 @@ fun HomeScreen(
     onBookClick: (Book) -> Unit,
     onAddBookClick: () -> Unit,
     onProfileClick: () -> Unit,
-    onNotificationClick: () -> Unit = {} // Ação opcional para notificações
+    onNotificationClick: () -> Unit = {}
 ) {
     val books by viewModel.books.collectAsState()
     val user by viewModel.currentUser.collectAsState()
 
-    // Observa o total de páginas lidas (calculado no ViewModel)
     val totalPages by viewModel.totalPagesRead.collectAsState()
 
     Scaffold(
@@ -49,7 +46,6 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF3E2723) // Marrom Café
                         )
-                        // Subtítulo com Total de Páginas + Nome do Usuário
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "$totalPages págs. lidas",
@@ -70,7 +66,6 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    // Ícone de Notificações
                     IconButton(onClick = onNotificationClick) {
                         Icon(
                             imageVector = Icons.Rounded.Notifications,
@@ -79,7 +74,6 @@ fun HomeScreen(
                             tint = Color(0xFF3E2723)
                         )
                     }
-                    // Ícone de Perfil
                     IconButton(onClick = onProfileClick) {
                         Icon(
                             imageVector = Icons.Rounded.AccountCircle,
@@ -97,13 +91,13 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddBookClick,
-                containerColor = Color(0xFF3E2723), // Marrom escuro
+                containerColor = Color(0xFF3E2723),
                 contentColor = Color.White
             ) {
                 Icon(Icons.Rounded.Add, contentDescription = "Adicionar Livro")
             }
         },
-        containerColor = Color(0xFFEFEBE9) // Fundo levemente acinzentado/papel
+        containerColor = Color(0xFFEFEBE9)
     ) { paddingValues ->
 
         Column(
@@ -167,7 +161,6 @@ fun BookItem(book: Book, onClick: () -> Unit) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder da Capa (se book.coverUrl não existir)
             Box(
                 modifier = Modifier
                     .size(50.dp, 70.dp)

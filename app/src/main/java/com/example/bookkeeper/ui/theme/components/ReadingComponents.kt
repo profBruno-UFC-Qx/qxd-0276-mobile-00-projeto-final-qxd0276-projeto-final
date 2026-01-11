@@ -25,7 +25,6 @@ fun SaveSessionDialog(
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
-                    // Usa a cor de superfície do tema (Branco Quente ou Madeira Escura)
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
                 elevation = CardDefaults.cardElevation(8.dp),
@@ -39,7 +38,6 @@ fun SaveSessionDialog(
                 ) {
                     Text(
                         text = "Sessão Finalizada!",
-                        // Aplica a fonte Bellefair e a cor Bronze
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -47,7 +45,6 @@ fun SaveSessionDialog(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Quantas páginas você leu hoje?",
-                        // Aplica a fonte Lato e a cor de texto padrão
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -64,7 +61,6 @@ fun SaveSessionDialog(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         colors = OutlinedTextFieldDefaults.colors(
-                            // Configura as cores do campo de texto para seguir o tema Dourado/Bronze
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                             focusedLabelColor = MaterialTheme.colorScheme.primary,

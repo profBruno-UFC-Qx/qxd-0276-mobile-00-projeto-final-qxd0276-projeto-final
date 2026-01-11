@@ -1,12 +1,10 @@
 package com.example.bookkeeper.ui.theme.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoStories
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Menu
@@ -15,9 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bookkeeper.viewmodel.BookViewModel
@@ -58,16 +54,13 @@ fun StatsScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- CÍRCULO DE PROGRESSO (Inspirado no Projeto Ui) ---
             Box(contentAlignment = Alignment.Center, modifier = Modifier.size(200.dp)) {
-                // Background do círculo
                 CircularProgressIndicator(
                     progress = { 1f },
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     strokeWidth = 12.dp,
                 )
-                // Progresso real (exemplo: meta de 10 livros no ano)
                 val progressValue = (booksRead.toFloat() / 10f).coerceIn(0f, 1f)
                 CircularProgressIndicator(
                     progress = { progressValue },
@@ -122,7 +115,6 @@ fun StatsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- CARD DE LEITURA ATUAL ---
             if (currentBook != null) {
                 Text(
                     text = "LENDO AGORA",

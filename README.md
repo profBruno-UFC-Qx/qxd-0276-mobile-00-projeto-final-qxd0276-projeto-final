@@ -22,34 +22,93 @@ Todos os livros são armazenados localmente por meio do Room, o que garante aces
 
 ## Funcionalidades Principais
 
-* [ ] **Navegação Multitela:** Implementação de múltiplas telas (Estante, Detalhes do Livro, Scanner).
-* [ ] **Persistência Local (Room):** Criação da entidade `Livro` e configuração do banco de dados Room para salvar a estante do usuário, permitindo acesso offline.
-* [ ] **CRUD de Livros:** O usuário pode adicionar (Create), ler (Read), atualizar  mudar status de leitura) e excluir (Delete) livros da sua estante.
-* [ ] **Integração com Câmera (Scanner de ISBN):** Uso da câmera para escanear o código de barras (ISBN) de um livro físico.
-* [ ] **Integração com API Externa (Google Books):** Após o scan, consultar a Google Books API para buscar e preencher automaticamente os dados do livro.
-* [ ] **Tema (Modo Claro/Escuro):** Implementação correta do `MaterialTheme`  para que o app se adapte automaticamente ao tema do sistema (light/dark).
-* [ ] **Organização (Prateleiras):** Exibição dos livros na tela principal, separados por status (ex: "Lendo", "Lidos", "Quero Ler").
-* [ ] **Cadastro Manual:** Permitir que o usuário adicione um livro manualmente caso o scan falhe ou o livro não tenha ISBN.
+* [x] **Navegação Multitela:** Implementação de múltiplas telas (Estante, Detalhes do Livro, Scanner).
+* [x] **Persistência Local (Room):** Criação da entidade `Livro` e configuração do banco de dados Room para salvar a estante do usuário, permitindo acesso offline.
+* [x] **CRUD de Livros:** O usuário pode adicionar (Create), ler (Read), atualizar  mudar status de leitura) e excluir (Delete) livros da sua estante.
+* [x] **Integração com Câmera (Scanner de ISBN):** Uso da câmera para escanear o código de barras (ISBN) de um livro físico.
+* [x] **Integração com API Externa (Google Books):** Após o scan, consultar a Google Books API para buscar e preencher automaticamente os dados do livro.
+* [x] **Tema (Modo Claro/Escuro):** Implementação correta do `MaterialTheme`  para que o app se adapte automaticamente ao tema do sistema (light/dark).
+* [x] **Organização (Prateleiras):** Exibição dos livros na tela principal, separados por status (ex: "Lendo", "Lidos", "Quero Ler").
+* [x] **Cadastro Manual:** Permitir que o usuário adicione um livro manualmente caso o scan falhe ou o livro não tenha ISBN.
 
 ---
 
+## 🛠️ Tecnologias e Bibliotecas
 
-> [!WARNING]
-> Daqui em diante o README.md só deve ser preenchido no momento da entrega final.
+O projeto utiliza as tecnologias mais modernas do ecossistema Android para garantir performance, persistência de dados e uma experiência de usuário fluida:
 
-##  Tecnologias: 
-Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
+- **Jetpack Compose**  
+  Framework moderno para construção de UI declarativa e reativa.
+
+- **Kotlin Coroutines & Flow**  
+  Para gerenciamento de chamadas assíncronas e fluxo de dados em tempo real entre o banco de dados e a UI.
+
+- **Room Database**  
+  Abstração sobre o SQLite para persistência local de livros, notas e sessões de leitura.
+
+- **Coil (Compose)**  
+  Biblioteca para carregamento de imagens de perfil e capas de livros via URL.
+
+- **Retrofit & OkHttp**  
+  Para consumo da API do Google Books para busca de livros por ISBN.
+
+- **CameraX**  
+  Utilizada para a implementação nativa da câmera e visualização do scanner.
+
+- **Google ML Kit (Barcode Scanning)**  
+  API de inteligência artificial para detecção e leitura ultra-rápida de códigos de barras (ISBN).
+
+- **ViewModel & StateFlow**  
+  Arquitetura MVVM para separação de lógica de negócio e estado da interface.
 
 ---
 
-## Instruções para Execução
-[Inclua instruções claras sobre como rodar o projeto localmente. Isso é crucial para que você possa testá-lo nas próximas entregas. **Somente caso haja alguma coisa diferente do usual**
+## 🚀 Instruções para Execução
+
+Para rodar o projeto localmente, siga os passos usuais de clonagem e build no Android Studio.  
+No entanto, devido ao uso de hardware (Câmera) e armazenamento, atente-se aos seguintes pontos:
+
+---
+
+### 1. 🔐 Permissões Necessárias
+
+O aplicativo solicitará permissões em tempo de execução.  
+Certifique-se de aceitá-las para o funcionamento total:
+
+- **CAMERA**  
+  Necessária para o scanner de livros e captura de foto de perfil.
+
+- **INTERNET**  
+  Para busca de capas e informações na API do Google.
+
+---
+
+### 2. ⚙️ Configuração de Hardware
+
+- **Scanner**  
+  O scanner funciona melhor em dispositivos físicos devido à necessidade de foco automático da lente.  
+  Se estiver usando um Emulador, certifique-se de habilitar a **Camera** nas configurações do AVD (Virtual Device) e aponte para um QR Code ou código de barras exibido na tela do computador.
+
+- **Armazenamento de Capas**  
+  As fotos tiradas pela câmera são salvas no diretório interno do aplicativo (`filesDir`), garantindo que as imagens persistam mesmo após fechar o app.
+
+---
+
+### 3. ▶️ Executando o Projeto
 
 ```bash
-# Clone o repositório
-git clone [https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories](https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories)
+# 1. Clone o repositório
+git clone https://github.com/profBruno-UFC-Qx/classroom-mobile-final-andressa-lima-colares.git
 
-# Navegue para o diretório
-cd [nome-do-repositorio]
+# 2. Abra o projeto no Android Studio
+# (Versão Ladybug ou superior recomendada)
 
-# Siga as instruções específicas para a sua tecnologia...
+# 3. Aguarde o Gradle Sync completar
+# (isso baixará as bibliotecas ML Kit e CameraX)
+
+# 4. Conecte um dispositivo físico via USB ou Wi-fi com dispositivo Android 11 ou +
+# ou use um Emulador com suporte a Camera
+
+# 5. Execute o projeto
+# Clique em 'Run' ou pressione Shift + F10
+

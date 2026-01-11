@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey
         entity = Book::class,
         parentColumns = ["id"],
         childColumns = ["bookId"],
-        onDelete = ForeignKey.CASCADE // Se apagar o livro, as notas somem
+        onDelete = ForeignKey.CASCADE
     )]
 )
 data class Note(
@@ -18,5 +18,5 @@ data class Note(
     val id: Int = 0,
     val bookId: Int,
     val content: String,
-    val timestamp: Long // Salva a data como milissegundos
+    val timestamp: Long
 )

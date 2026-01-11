@@ -27,8 +27,6 @@ fun BarcodeScanner(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Variável para travar leituras múltiplas
-    // Assim que ler 1 vez, isso vira 'true' e ignora o resto
     var isScanningLocked by remember { mutableStateOf(false) }
 
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -57,8 +55,7 @@ fun BarcodeScanner(
                     .build()
 
                 imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
-                    // --- TRAVA DE LEITURA ---
-                    // Se já leu um código, fecha a imagem e não faz mais nada
+
                     if (isScanningLocked) {
                         imageProxy.close()
                         return@setAnalyzer
@@ -76,17 +73,14 @@ fun BarcodeScanner(
 
                         scanner.process(image)
                             .addOnSuccessListener { barcodes ->
-                                // Verifica de novo se não está travado (segurança extra)
                                 if (!isScanningLocked && barcodes.isNotEmpty()) {
                                     for (barcode in barcodes) {
                                         barcode.rawValue?.let { code ->
-                                            // TRAVA AGORA! 🛑
                                             isScanningLocked = true
 
                                             Log.d("SCANNER", "Código lido e travado: $code")
                                             onBarcodeDetected(code)
 
-                                            // Só precisamos do primeiro código válido
                                             return@addOnSuccessListener
                                         }
                                     }

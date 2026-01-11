@@ -3,7 +3,6 @@ package com.example.bookkeeper.ui.theme.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +36,6 @@ fun ReadingSessionScreen(
     val activeBook by viewModel.activeBookForSession.collectAsState()
     val books by viewModel.books.collectAsState()
 
-    // Estados do Cronômetro
     val elapsedTime by viewModel.elapsedTimeSeconds.collectAsState()
     val isTimerRunning by viewModel.isTimerRunning.collectAsState()
     val showSessionDialog by viewModel.showSaveSessionDialog.collectAsState()
@@ -59,7 +56,6 @@ fun ReadingSessionScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (activeBook == null) {
-                // ESTADO 1: SELECIONAR LIVRO
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         "O que vamos ler hoje?",
@@ -74,13 +70,11 @@ fun ReadingSessionScreen(
                     }
                 }
             } else {
-                // ESTADO 2: CRONÔMETRO ATIVO
                 Column(
                     modifier = Modifier.fillMaxSize().padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Botão para fechar/trocar livro (só se o timer estiver parado)
                     if (!isTimerRunning && elapsedTime == 0L) {
                         IconButton(
                             onClick = { viewModel.setActiveBookForSession(null) },
@@ -90,7 +84,6 @@ fun ReadingSessionScreen(
                         }
                     }
 
-                    // Capa do Livro
                     Card(
                         elevation = CardDefaults.cardElevation(8.dp),
                         shape = RoundedCornerShape(12.dp),
@@ -111,7 +104,6 @@ fun ReadingSessionScreen(
 
                     Spacer(Modifier.height(40.dp))
 
-                    // Mostrador do Tempo
                     val hours = elapsedTime / 3600
                     val minutes = (elapsedTime % 3600) / 60
                     val seconds = elapsedTime % 60
@@ -122,18 +114,15 @@ fun ReadingSessionScreen(
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Light,
                         color = MaterialTheme.colorScheme.primary,
-                        // Usando Monospace apenas para os números não ficarem pulando
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                     )
 
                     Spacer(Modifier.height(40.dp))
 
-                    // Controles
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(24.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Play/Pause
                         Button(
                             onClick = { viewModel.toggleTimer() },
                             shape = CircleShape,
@@ -149,7 +138,6 @@ fun ReadingSessionScreen(
                             )
                         }
 
-                        // Stop (Salvar)
                         if (elapsedTime > 0) {
                             Button(
                                 onClick = { viewModel.finishSession() },
@@ -165,7 +153,6 @@ fun ReadingSessionScreen(
             }
         }
 
-        // Dialog de Salvar
         SaveSessionDialog(
             show = showSessionDialog,
             onDismiss = { viewModel.dismissSessionDialog() },

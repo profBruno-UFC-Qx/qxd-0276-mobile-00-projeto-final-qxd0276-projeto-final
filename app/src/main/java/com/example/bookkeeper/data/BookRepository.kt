@@ -3,16 +3,15 @@ package com.example.bookkeeper.data
 import com.example.bookkeeper.model.Book
 import com.example.bookkeeper.model.ReadingSession
 import com.example.bookkeeper.model.User
-import com.example.bookkeeper.model.Note // <--- Importe o Note
+import com.example.bookkeeper.model.Note
 import kotlinx.coroutines.flow.Flow
 
 class BookRepository(
     private val bookDao: BookDao,
     private val userDao: UserDao,
     private val sessionDao: ReadingSessionDao,
-    private val noteDao: NoteDao // <--- 1. Adicione o NoteDao aqui no construtor
+    private val noteDao: NoteDao
 ) {
-    // --- MÉTODOS DE USUÁRIO (Já existentes) ---
     suspend fun getUserByEmail(email: String): User? {
         return userDao.getUserByEmail(email)
     }
@@ -47,7 +46,6 @@ class BookRepository(
         userDao.deleteUser(user)
     }
 
-    // --- MÉTODOS DE LIVROS (Já existentes) ---
     fun getBooksForUser(userId: Int): Flow<List<Book>> {
         return bookDao.getBooksForUser(userId)
     }
@@ -64,7 +62,6 @@ class BookRepository(
         bookDao.deleteBook(book)
     }
 
-    // --- MÉTODOS DE SESSÃO DE LEITURA (Já existentes) ---
     suspend fun insertReadingSession(session: ReadingSession) {
         sessionDao.insertSession(session)
     }
@@ -77,24 +74,19 @@ class BookRepository(
         return sessionDao.getAverageSecondsPerPage(bookId)
     }
 
-    // --- 2. NOVOS MÉTODOS PARA NOTAS (Adicione estes) ---
 
-    // Inserir nota
     suspend fun insertNote(note: Note) {
         noteDao.insert(note)
     }
 
-    // Atualizar nota (para editar o texto)
     suspend fun updateNote(note: Note) {
         noteDao.update(note)
     }
 
-    // Deletar nota
     suspend fun deleteNote(note: Note) {
         noteDao.delete(note)
     }
 
-    // Pegar lista de notas de um livro específico
     fun getNotesForBook(bookId: Int): Flow<List<Note>> {
         return noteDao.getNotesByBookId(bookId)
     }

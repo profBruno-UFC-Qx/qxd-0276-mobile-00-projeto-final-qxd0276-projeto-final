@@ -20,7 +20,6 @@ interface NoteDao {
     @Delete
     suspend fun delete(note: Note)
 
-    // Traz as notas de um livro específico, ordenadas da mais nova para a mais antiga
     @Query("SELECT * from notes WHERE bookId = :bookId ORDER BY timestamp DESC")
     fun getNotesByBookId(bookId: Int): Flow<List<Note>>
 }

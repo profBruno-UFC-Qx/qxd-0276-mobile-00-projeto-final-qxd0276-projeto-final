@@ -20,17 +20,14 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingScreen() {
-    // --- Configuração da Animação Lottie ---
-    // 1. Carrega o arquivo json da pasta raw
+
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.book_loading_anim))
 
-    // 2. Controla o progresso da animação (loop infinito)
     val progress by animateLottieCompositionAsState(
         composition = composition,
-        iterations = LottieConstants.IterateForever // Faz ficar repetindo para sempre
+        iterations = LottieConstants.IterateForever
     )
 
-    // --- Configuração das frases ---
     val messages = listOf(
         "Abrindo a estante...",
         "Catalogando livro...",
@@ -41,7 +38,7 @@ fun LoadingScreen() {
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(1200) // Aumentei um pouco o tempo para dar tempo de ler
+            delay(1200)
             currentMessageIndex = (currentMessageIndex + 1) % messages.size
         }
     }
@@ -57,21 +54,18 @@ fun LoadingScreen() {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
-            // --- ONDE A MÁGICA ACONTECE ---
-            // Substituímos o CircularProgressIndicator por isso:
             LottieAnimation(
                 composition = composition,
                 progress = { progress },
                 modifier = Modifier
-                    .size(180.dp) // Ajuste o tamanho conforme necessário
+                    .size(180.dp)
                     .padding(bottom = 16.dp)
             )
 
-            // O texto charmoso embaixo
             Text(
                 text = messages[currentMessageIndex],
-                style = MaterialTheme.typography.headlineMedium, // Usa a fonte Bellefair
-                color = MaterialTheme.colorScheme.primary, // Cor Bronze/Dourada
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
         }
