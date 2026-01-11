@@ -5,7 +5,6 @@
 ## Equipe
 * **João Italo Maia Alves - 554701**
 
-
 ---
 
 ## Título do Projeto
@@ -41,17 +40,30 @@ O público-alvo do EcoTracker são pessoas interessadas em adotar um estilo de v
 
 ##  Tecnologias: 
 Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
+Este projeto foi desenvolvido utilizando as seguintes tecnologias, bibliotecas e ferramentas:
 
+- **Kotlin** — linguagem principal para desenvolvimento Android
+- **Android SDK** — plataforma de desenvolvimento mobile
+- **Jetpack Compose** — framework moderno para construção de interfaces declarativas
+- **Material 3** — biblioteca de componentes visuais seguindo o Material Design
+- **Retrofit** — consumo de APIs REST
+- **OkHttp** — cliente HTTP para comunicação com serviços remotos
+- **Gson** — serialização e desserialização de objetos JSON
+- **Coroutines** — programação assíncrona e concorrente
+- **StateFlow / Flow** — gerenciamento reativo de estados
+- **ViewModel (Android Architecture Components)** — separação de responsabilidades e gerenciamento do ciclo de vida
+- **Navigation2** — navegação entre telas
+- **DataStore Preferences** — armazenamento local de dados persistentes
+- **Gradle Version Catalog (libs.versions.toml)** — gerenciamento centralizado de dependências
+- **Git & GitHub** — controle de versão e hospedagem do código-fonte
 ---
 
 ## Instruções para Execução
-[Inclua instruções claras sobre como rodar o projeto localmente. Isso é crucial para que você possa testá-lo nas próximas entregas. **Somente caso haja alguma coisa diferente do usual**
+O projeto segue o fluxo padrão de execução de aplicações Android. Para executá-lo localmente, siga os passos abaixo:
 
 ```bash
 # Clone o repositório
-git clone [https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories](https://docs.github.com/pt/repositories/creating-and-managing-repositories/about-repositories)
+git clone <https://github.com/profBruno-UFC-Qx/classroom-mobile-final-devdroids.git>
 
-# Navegue para o diretório
-cd [nome-do-repositorio]
-
-# Siga as instruções específicas para a sua tecnologia...
+# Navegue até o diretório do projeto
+cd <classroom-mobile-final-devdroids>
