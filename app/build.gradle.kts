@@ -103,6 +103,8 @@ dependencies {
 
     //--- NAVIGATION 2 ---
     implementation(libs.navigation.compose)
+    //--- TRADUTOR ---
+    implementation(libs.mlkit.translate)
     // --- Testes ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

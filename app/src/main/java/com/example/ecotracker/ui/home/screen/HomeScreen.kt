@@ -37,7 +37,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🌳 Árvore
+        // Árvore
         Image(
             painter = painterResource(
                 id = when {
@@ -53,7 +53,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 📊 Progresso
+        // Progresso
         LinearProgressIndicator(
             progress = animatedProgress,
             modifier = Modifier.fillMaxWidth()
@@ -61,20 +61,19 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 💬 Frase motivacional
+        // Frase motivacional
         Text(
             text = uiState.motivationalPhrase,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )
+        Text(
+            text = "Fonte: ZenQuotes.io",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { viewModel.refreshPhrase() }
-        ) {
-            Text("Nova frase")
-        }
     }
 }

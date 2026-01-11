@@ -3,7 +3,6 @@
 # Proposta de aplicativo
 
 ## Equipe
-* **Carlos Jeferson Jacinto da Silva - 552568**
 * **João Italo Maia Alves - 554701**
 
 
@@ -21,19 +20,19 @@ O público-alvo do EcoTracker são pessoas interessadas em adotar um estilo de v
 
 ## Funcionalidades Principais
 
-- [ ] Funcionalidade 1: Cadastro, edição e exclusão de hábitos sustentáveis (CRUD), permitindo que o usuário personalize suas ações ecológicas.
+- [ X ] Funcionalidade 1: Cadastro, edição e exclusão de hábitos sustentáveis (CRUD), permitindo que o usuário personalize suas ações ecológicas.
 
-- [ ] Funcionalidade 2: Armazenamento local de dados com Room, garantindo acesso offline e segurança das informações.
+- [ X ] Funcionalidade 2: Armazenamento local de dados com Room, garantindo acesso offline e segurança das informações.
 
-- [ ] Funcionalidade 3: Integração com API externa para exibir dicas ecológicas diárias, incentivando boas práticas ambientais.
+- [ X ] Funcionalidade 3: Integração com API externa para exibir dicas ecológicas diárias, incentivando boas práticas ambientais.
 
-- [ ] Funcionalidade 4: Uso de GPS para estimar o impacto coletivo das ações sustentáveis na cidade ou região.
+- [ X ] Funcionalidade 4: Uso de GPS para estimar o impacto coletivo das ações sustentáveis na cidade ou região.
 
-- [ ] Funcionalidade 5: Design moderno com MaterialTheme, incluindo modo escuro e claro automático.
+- [ X ] Funcionalidade 5: Design moderno com MaterialTheme, incluindo modo escuro e claro automático.
 
-- [ ] Funcionalidade 6: Gamificação com uma árvore virtual que cresce conforme o usuário cumpre metas sustentáveis.
+- [ X ] Funcionalidade 6: Gamificação com uma árvore virtual que cresce conforme o usuário cumpre metas sustentáveis.
 
-- [ ] Funcionalidade 7: Arquitetura MVVM com Jetpack Compose, garantindo melhor desempenho e organização do código.
+- [ X ] Funcionalidade 7: Arquitetura MVVM com Jetpack Compose, garantindo melhor desempenho e organização do código.
 
 ---
 
