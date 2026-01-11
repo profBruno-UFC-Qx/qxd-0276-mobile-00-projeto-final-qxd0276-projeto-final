@@ -23,20 +23,29 @@ O aplicativo possui suporte a modo claro/escuro, integração opcional com APIs 
 ## Funcionalidades Principais
 [Liste as principais funcionalidades do projeto. Use caixas de seleção para que a equipe possa marcar as concluídas nas próximas etapas.]
 
-- [ ] Captura de fotos:    Captura de fotos usando a câmera do dispositivo com CameraX
-- [ ] Armazenamento local: Armazenamento local das imagens e metadados usando Room
-- [ ] Galeria integrada:   Galeria integrada para visualização, edição (título, tags) e exclusão das fotos
-- [ ] Geolocalização:      Integração com API de geolocalização para registrar e exibir o local onde a foto foi tirada
+- [x] Captura de fotos:    Captura de fotos usando a câmera do dispositivo com CameraX
+- [x] Armazenamento local: Armazenamento local das imagens e metadados usando Room
+- [x] Galeria integrada:   Galeria integrada para visualização, edição (título, tags) e exclusão das fotos
+- [x] Geolocalização:      Integração com API de geolocalização para registrar e exibir o local onde a foto foi tirada
 
 ---
 
 > [!WARNING]
 > Daqui em diante o README.md só deve ser preenchido no momento da entrega final.
 
-##  Tecnologias: 
-Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
+##  Tecnologias:
 
----
+- **Kotlin:** Linguagem de programação utilizada.
+- **Arquitetura MVVM:** Padrão arquitetural adotado.
+- **Jetpack Compose:** Criação da interface.
+- **CameraX:** Biblioteca do Jetpack para captura de fotos.
+- **Room:** Persistência local de dados.
+- **Navigation Compose:** Navegação entre telas.
+- **MediaStore**: Armazenamento e acesso seguro às fotos no dispositivo.
+- **Coil**: Carregamento e exibição de imagens.
+- **Zoomable**: Biblioteca open-source para Compose que permite zoom.
+- **FileProvider**: Compartilhamento de arquivos entre aplicativos.
+- **LocationManager**: API nativa para obtenção da localização do dispositivo.
 
 ## Instruções para Execução
 [Inclua instruções claras sobre como rodar o projeto localmente. Isso é crucial para que você possa testá-lo nas próximas entregas. **Somente caso haja alguma coisa diferente do usual**
