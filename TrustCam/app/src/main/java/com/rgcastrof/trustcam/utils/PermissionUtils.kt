@@ -3,10 +3,6 @@ package com.rgcastrof.trustcam.utils
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 
 object PermissionUtils {
