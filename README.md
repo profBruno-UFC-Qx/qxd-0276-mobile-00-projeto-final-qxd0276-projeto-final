@@ -32,7 +32,7 @@ O público-alvo são **leitores que buscam autonomia e praticidade** para acompa
 
 ## Repositórios
 Possui a versão mais recente do projeto.  
-- **Aplicativo mobile**: [RewelliOliveira/livoAppOfBooks](https://github.com/RewelliOliveira/livoAppOfBooks).
+- **Aplicativo mobile**: [RewelliOliveira/livoAppOfBooks](https://github.com/RewelliOliveira/livoAppOfBooks/tree/developer).
 - **API backend**: [kauanper/livo-api](https://github.com/kauanper/livo-api).
 
 ---
