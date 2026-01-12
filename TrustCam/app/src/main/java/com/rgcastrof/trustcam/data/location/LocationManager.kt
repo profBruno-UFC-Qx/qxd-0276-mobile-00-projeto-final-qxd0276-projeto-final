@@ -1,12 +1,14 @@
 package com.rgcastrof.trustcam.data.location
 
+import android.Manifest
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.location.LocationListener
 import android.util.Log
+import androidx.annotation.RequiresPermission
 
-class LocationListener(context: Context): LocationListener {
+class LocationHandler(context: Context): LocationListener {
     private val appContext = context.applicationContext
     private val locationManager = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -26,6 +28,7 @@ class LocationListener(context: Context): LocationListener {
             locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     fun requestLocation() {
         val lastGps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         val lastNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)

@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import com.rgcastrof.trustcam.data.location.LocationListener
+import com.rgcastrof.trustcam.data.location.LocationHandler
 import com.rgcastrof.trustcam.ui.composables.CameraControls
 import com.rgcastrof.trustcam.ui.composables.CameraOptionsMenu
 import com.rgcastrof.trustcam.uistate.CameraUiState
@@ -38,7 +38,7 @@ fun CameraScreen(
     context: Context
 ) {
     val mediaActionSound = remember { MediaActionSound() }
-    val locationListener = remember { LocationListener(context) }
+    val locationHandler = remember { LocationHandler(context) }
 
     DisposableEffect(Unit) {
         mediaActionSound.load(MediaActionSound.SHUTTER_CLICK)
@@ -86,7 +86,7 @@ fun CameraScreen(
             onToggleGridState = onToggleGridState,
             onToggleAspectRatio = onToggleAspectRatio,
             onToggleLocation = onToggleLocation,
-            locationListener = locationListener
+            locationHandler = locationHandler
         )
 
         CameraControls(
@@ -99,7 +99,7 @@ fun CameraScreen(
                 CameraUtils.takePhoto(
                     context = context,
                     controller = controller,
-                    location = locationListener.currentFetchedLocation,
+                    location = locationHandler.currentFetchedLocation,
                     onPhotoCaptured = storePhotoInDevice,
                 )
             },

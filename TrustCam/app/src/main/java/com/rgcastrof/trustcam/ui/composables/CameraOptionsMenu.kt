@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.rgcastrof.trustcam.data.location.LocationListener
+import com.rgcastrof.trustcam.data.location.LocationHandler
 import com.rgcastrof.trustcam.uistate.CameraUiState
 import com.rgcastrof.trustcam.utils.PermissionUtils
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ fun CameraOptionsMenu(
     onToggleGridState: () -> Unit,
     onToggleAspectRatio: () -> Unit,
     onToggleLocation: () -> Unit,
-    locationListener: LocationListener
+    locationHandler: LocationHandler
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -93,18 +93,18 @@ fun CameraOptionsMenu(
                         val missing = PermissionUtils.getMissingPermissions(context)
 
                         if (missing.isEmpty()) {
-                            if (!locationListener.isGpsEnabled()) {
+                            if (!locationHandler.isGpsEnabled()) {
                                 context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                             } else {
                                 onToggleLocation()
 
                                 if (!uiState.locationState) {
                                     scope.launch {
-                                        locationListener.requestLocation()
+                                        locationHandler.requestLocation()
                                         Log.d("Location", "GPS start listening")
                                     }
                                 } else {
-                                    locationListener.stopRequest()
+                                    locationHandler.stopRequest()
                                     Log.d("Location", "GPS stop listening")
                                 }
                             }
