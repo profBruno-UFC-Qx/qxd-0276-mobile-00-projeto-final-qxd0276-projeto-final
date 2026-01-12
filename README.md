@@ -63,13 +63,8 @@ O projeto segue o fluxo padrão de execução de aplicações Android. Para exec
 
 ```bash
 # Clone o repositório
-<<<<<<< HEAD
-git clone <https://github.com/profBruno-UFC-Qx/classroom-mobile-final-devdroids.git>
-
 =======
-
 git clone <https://github.com/profBruno-UFC-Qx/classroom-mobile-final-devdroids.git>
 
->>>>>>> main
 # Navegue até o diretório do projeto
 cd <classroom-mobile-final-devdroids>

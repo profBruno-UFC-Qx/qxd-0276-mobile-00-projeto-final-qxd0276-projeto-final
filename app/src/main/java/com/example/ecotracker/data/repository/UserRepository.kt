@@ -7,7 +7,8 @@ import com.example.ecotracker.data.local.dao.UserDao
 import com.example.ecotracker.data.local.entity.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.handleCoroutineException
+import com.example.ecotracker.data.datastore.UserPreferences
+import com.example.ecotracker.data.datastore.UserSession
 
 sealed class UserError(message: String) : Exception(message) {
     object DatabaseError : UserError("Erro no banco de Dados")
@@ -15,7 +16,8 @@ sealed class UserError(message: String) : Exception(message) {
 }
 
 class UserRepository(
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val userPreferences: UserPreferences
 ) {
     // Crud
     suspend fun registerUser(user: User): Result<Unit> {
@@ -53,6 +55,10 @@ class UserRepository(
             Result.failure(UserError.DatabaseError)
         }
     }
+    // Retorna o usuário logado (ou null)
+    fun getLoggedUserPreference(): Flow<UserSession?> = userPreferences.userFlow
+    suspend fun saveUser(user: UserSession) = userPreferences.saveUser(user.id, user.name, user.email)
+    suspend fun clearUser() = userPreferences.clearUser()
 
     // Querys
     fun getLoggedUser(): Flow<User?> {

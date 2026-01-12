@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ecotracker.ui.register.viewmodel.RegisterViewModel
@@ -18,6 +19,7 @@ fun RegisterScreen(
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var dataNascimento by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
 
@@ -33,7 +35,8 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             OutlinedTextField(
@@ -47,7 +50,17 @@ fun RegisterScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Senha") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             OutlinedTextField(
@@ -64,20 +77,24 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
                     viewModel.register(
                         name = name,
                         email = email,
+                        password = password,
                         birth = dataNascimento,
-                        bio = bio
+                        bio = bio,
+                        onSuccess = onRegisterSuccess
                     )
-                    onRegisterSuccess()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !loading
+                enabled = !loading &&
+                        name.isNotBlank() &&
+                        email.isNotBlank() &&
+                        password.isNotBlank()
             ) {
                 Text(if (loading) "Criando conta..." else "Cadastrar")
             }

@@ -19,6 +19,7 @@ import com.example.ecotracker.ui.profile.screen.EditProfileScreen
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -67,11 +68,7 @@ fun MainNavGraph(
         // Perfil
         composable(Routes.PROFILE) {
             ProfileScreen(
-                onLogout = {
-                    navController.navigate(Routes.LOGIN){
-                        popUpTo(0)
-                    }
-                },
+                onLogout = onLogout,
                 onNavigateToEditProfile = {
                     navController.navigate(Routes.EDIT_PROFILE)
                 }

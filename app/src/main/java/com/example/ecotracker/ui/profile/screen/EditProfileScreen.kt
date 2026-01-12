@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ecotracker.ui.profile.viewmodel.ProfileViewModel
@@ -33,11 +35,13 @@ fun EditProfileScreen(
     onCancel: () -> Unit
 ) {
     val user by viewModel.user.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var birth by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     LaunchedEffect(user) {
         user?.let {
@@ -89,6 +93,14 @@ fun EditProfileScreen(
                 label = { Text("Bio") },
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Nova Senha (opcional)") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -98,7 +110,8 @@ fun EditProfileScreen(
                         name = name,
                         email = email,
                         dataNascimento = birth,
-                        bio = bio
+                        bio = bio,
+                        password = password.takeIf { it.isNotBlank() }
                     )
                     onSave()
                 },
@@ -113,6 +126,12 @@ fun EditProfileScreen(
             ) {
                 Text("Cancelar")
             }
+
+            error?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+
         }
     }
 }

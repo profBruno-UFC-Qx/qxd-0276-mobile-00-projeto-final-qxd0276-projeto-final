@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecotracker.data.local.entity.User
 import com.example.ecotracker.data.repository.UserRepository
+import com.example.ecotracker.utils.hashPassword
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -30,28 +31,26 @@ class ProfileViewModel(
     }
     fun updateUser(
         name: String,
+        email: String,
         dataNascimento: String,
-        email:String,
-        bio: String
-    ){
-        val currentUser = _user.value ?: return
-        viewModelScope.launch{
-            try {
-                val updatedUser = currentUser.copy(
-                    name = name,
-                    dataNascimento = dataNascimento,
-                    email = email,
-                    bio = bio
-                )
+        bio: String,
+        password: String? = null
+    ) {
+        viewModelScope.launch {
+            val currentUser = user.value ?: return@launch
 
-                userRepository.updateUser(updatedUser)
-                _user.value = updatedUser
+            val updatedUser = currentUser.copy(
+                name = name,
+                email = email,
+                dataNascimento = dataNascimento,
+                bio = bio,
+                passwordHash = password?.let { hashPassword(it) } ?: currentUser.passwordHash
+            )
 
-            } catch (e: Exception) {
-                _error.value = "Erro ao atualizar perfil"
-            }
+            userRepository.updateUser(updatedUser)
         }
     }
+
     fun logout() {
         viewModelScope.launch {
             userRepository.logOutUser()

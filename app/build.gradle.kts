@@ -48,9 +48,9 @@ android {
         compose = true
         buildConfig = true
     }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.5.11"
-//    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.4"
+    }
     compileOptions{
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -105,6 +105,8 @@ dependencies {
     implementation(libs.navigation.compose)
     //--- TRADUTOR ---
     implementation(libs.mlkit.translate)
+    //--- DATASTORE ---
+    implementation(libs.datastore.preferences)
     // --- Testes ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

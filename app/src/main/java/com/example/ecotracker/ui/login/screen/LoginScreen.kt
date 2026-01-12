@@ -1,6 +1,5 @@
 package com.example.ecotracker.ui.login.screen
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,14 +8,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ecotracker.di.AppContainer
 import com.example.ecotracker.ui.login.viewmodel.LoginViewModel
+import com.example.ecotracker.ui.login.viewmodel.LoginViewModelFactory
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory),
     onLoginSuccess: () -> Unit,
     onRegisterNewUser: () -> Unit
 ) {
+
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -41,7 +43,9 @@ fun LoginScreen(
             value = email,
             onValueChange = viewModel::onEmailChange,
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            enabled = !loading
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -51,7 +55,9 @@ fun LoginScreen(
             onValueChange = viewModel::onPasswordChange,
             label = { Text("Senha") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            enabled = !loading
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -59,18 +65,26 @@ fun LoginScreen(
         Button(
             onClick = { viewModel.login(onLoginSuccess) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !loading
+            enabled = !loading && email.isNotBlank() && password.isNotBlank()
         ) {
-            Text(if (loading) "Entrando..." else "Entrar")
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Entrar")
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         TextButton(
             onClick = onRegisterNewUser,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !loading
         ) {
-            Text("Não tem conta? Registre-se")
+            Text("Não tem conta? Cadastre-se")
         }
 
         error?.let {

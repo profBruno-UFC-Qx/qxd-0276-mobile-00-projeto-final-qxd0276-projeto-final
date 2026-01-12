@@ -17,7 +17,12 @@ fun MainScaffold() {
     ) { padding ->
         MainNavGraph(
             navController = navController,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            onLogout = {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.MAIN) { inclusive = true }
+                }
+            }
         )
     }
 }

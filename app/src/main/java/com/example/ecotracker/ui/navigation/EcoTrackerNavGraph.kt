@@ -9,21 +9,38 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ecotracker.data.local.dao.UserDao
+import com.example.ecotracker.data.repository.UserRepository
 import com.example.ecotracker.ui.login.screen.LoginScreen
 import com.example.ecotracker.ui.register.screen.RegisterScreen
+import com.example.ecotracker.ui.start.screen.StartScreen
 
 @Composable
 fun EcoTrackerNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-
     NavHost(
         navController = navController,
-        startDestination = Routes.LOGIN,
+        startDestination = Routes.START,
         modifier = modifier
     ) {
 
+        // Start
+        composable("start") {
+            StartScreen(
+                onGoToHome = {
+                    navController.navigate("main") {
+                        popUpTo("start") { inclusive = true }
+                    }
+                },
+                onGoToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("start") { inclusive = true }
+                    }
+                }
+            )
+        }
         // Login
         composable(Routes.LOGIN) {
             LoginScreen(
@@ -41,10 +58,14 @@ fun EcoTrackerNavGraph(
         composable(Routes.REGISTER) {
             RegisterScreen(
                 onRegisterSuccess = {
-                    navController.navigate(Routes.MAIN)
+                    navController.navigate(Routes.MAIN){
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    }
                 },
                 onGoToLogin ={
-                    navController.navigate(Routes.LOGIN)
+                    navController.navigate(Routes.LOGIN){
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    }
                 }
             )
         }

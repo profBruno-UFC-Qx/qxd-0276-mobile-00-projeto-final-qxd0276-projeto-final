@@ -2,8 +2,7 @@ package com.example.ecotracker
 
 import android.app.Application
 import com.google.android.libraries.places.api.Places
-import com.example.ecotracker.data.di.AppContainer
-import com.example.ecotracker.BuildConfig
+import com.example.ecotracker.di.AppContainer
 
 class EcoTrackerApplication : Application() {
 

@@ -10,4 +10,5 @@ object Routes {
     const val PROFILE = "profile"
     const val EDIT_PROFILE = "edit_profile"
     const val REGISTER ="register"
+    const val START ="start"
 }

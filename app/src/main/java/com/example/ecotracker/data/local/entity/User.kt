@@ -18,6 +18,7 @@ data class User(
     val dataNascimento: String,
     val email: String,
     val bio: String,
-    val password: String,
+    val passwordHash: String,
+    val logged: Boolean,
     val createdAt: Long = System.currentTimeMillis()
 )

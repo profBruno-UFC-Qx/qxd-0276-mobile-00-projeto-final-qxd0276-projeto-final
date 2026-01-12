@@ -21,6 +21,7 @@ googleMapsCompose = "6.4.1"
 googleMapsServices = "18.2.0"
 googlePlaces = "3.4.0"
 mlkitTranslate = "17.0.2"
+datastore = "1.1.0"
 #Navigation
 navigation = "2.9.6"
 material3 = "1.4.0"
@@ -63,8 +64,12 @@ google-places = { group = "com.google.android.libraries.places", name = "places"
 
 #--- Navigation ---
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+
 #--- Tradutor ---
 mlkit-translate = { group = "com.google.mlkit", name = "translate", version.ref = "mlkitTranslate" }
+
+#--- DataStore ---
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # --- TESTES ---
 junit = { group = "junit", name = "junit", version.ref = "junit" }
