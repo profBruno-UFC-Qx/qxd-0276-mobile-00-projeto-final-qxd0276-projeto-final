@@ -7,7 +7,8 @@ import android.location.LocationListener
 import android.util.Log
 
 class LocationListener(context: Context): LocationListener {
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val appContext = context.applicationContext
+    private val locationManager = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     var currentFetchedLocation: Location? = null
         private set
