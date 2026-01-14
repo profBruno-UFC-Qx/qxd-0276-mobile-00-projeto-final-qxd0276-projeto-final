@@ -58,7 +58,7 @@ fun EcoTrackerNavGraph(
         composable(Routes.REGISTER) {
             RegisterScreen(
                 onRegisterSuccess = {
-                    navController.navigate(Routes.MAIN){
+                    navController.navigate(Routes.LOGIN){
                         popUpTo(Routes.REGISTER) { inclusive = true }
                     }
                 },
@@ -71,7 +71,9 @@ fun EcoTrackerNavGraph(
         }
         // Área principal
         composable(Routes.MAIN) {
-            MainScaffold()
+            MainScaffold(
+                rootNavController = navController
+            )
         }
     }
 }

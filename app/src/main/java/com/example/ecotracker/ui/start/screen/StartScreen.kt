@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ecotracker.ui.start.viewmodel.StartDestination
 import com.example.ecotracker.ui.start.viewmodel.StartViewModel
 import com.example.ecotracker.ui.start.viewmodel.StartViewModelFactory
 
@@ -16,32 +17,20 @@ fun StartScreen(
     onGoToHome: () -> Unit,
     onGoToLogin: () -> Unit
 ) {
-    val loading by viewModel.loading.collectAsState()
+    val destination by viewModel.destination.collectAsState()
 
-    // Flag para garantir que só navegamos uma vez
-    var navigated by remember { mutableStateOf(false) }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (loading) {
-            CircularProgressIndicator()
-        } else {
-            // Se não houver usuário logado e ainda não navegamos
-            if (!navigated) {
-                LaunchedEffect(Unit) {
-                    navigated = true
-                    onGoToLogin()
-                }
-            }
+    // Observa o estado de destino e decide a navegação
+    LaunchedEffect(destination) {
+        when (destination){
+            StartDestination.Home -> onGoToHome()
+            StartDestination.Login -> onGoToLogin()
+            StartDestination.Loading -> Unit
         }
     }
 
-    // Callback para quando houver usuário logado
-    LaunchedEffect(Unit) {
-        viewModel.setOnUserLogged {
-            if (!navigated) {
-                navigated = true
-                onGoToHome()
-            }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        if (destination == StartDestination.Login) {
+            CircularProgressIndicator()
         }
     }
 }

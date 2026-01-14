@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,18 +21,31 @@ import androidx.compose.ui.unit.sp
 import com.example.ecotracker.data.local.entity.Habit
 
 @Composable
-internal fun HabitItem(habit: Habit, onDeleteClick: () -> Unit) {
+internal fun HabitItem(
+    habit: Habit,
+    onToggleComplete: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    isCompleted: Boolean
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Checkbox(
+            checked = isCompleted,
+            onCheckedChange = { onToggleComplete() }
+        )
         Column(modifier = Modifier.weight(1f)) {
             Text(text = habit.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             if (habit.description.isNotBlank()) {
                 Text(text = habit.description, style = MaterialTheme.typography.bodyMedium)
             }
+        }
+        IconButton(onClick = onEditClick) {
+            Icon(Icons.Default.Edit, contentDescription = "Editar Hábito", tint = MaterialTheme.colorScheme.error)
         }
         IconButton(onClick = onDeleteClick) {
             Icon(Icons.Default.Delete, contentDescription = "Deletar Hábito", tint = MaterialTheme.colorScheme.error)

@@ -17,46 +17,49 @@ import com.example.ecotracker.ui.map.screen.MapSelectionScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
-    viewModel: HabitViewModel,
+    habitViewModel: HabitViewModel,
+    habitId: Long? = null,
     onNavigateBack: () -> Unit
 ) {
-    // Estados do formulário
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
 
-    // Estados de localização
-    var locationName by remember { mutableStateOf<String?>(null) }
-    var latitude by remember { mutableStateOf<Double?>(null) }
-    var longitude by remember { mutableStateOf<Double?>(null) }
+    LaunchedEffect(habitId) {
+        if (habitId != null) {
+            habitViewModel.startEditHabit(habitId)
+        }
+    }
 
-    // Validação
-    var isNameError by remember { mutableStateOf(false) }
-
-    // Estado do mapa
-    var showMapScreen by remember { mutableStateOf(false) }
+    val uiState by habitViewModel.addHabitUiState.collectAsState()
 
     // Tela do mapa como diálogo
-    if (showMapScreen) {
+    if (uiState.showMapScreen) {
         Dialog(
-            onDismissRequest = { showMapScreen = false },
+            onDismissRequest = { habitViewModel.onShowMapChange(false) },
             properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
             MapSelectionScreen(
-                onPlaceSelected = { place ->
-                    locationName = place.name ?: place.address
-                    latitude = place.latLng?.latitude
-                    longitude = place.latLng?.longitude
-                    showMapScreen = false
-                },
-                onCancel = { showMapScreen = false }
-            )
+            onPlaceSelected = { place ->
+                habitViewModel.onLocationSelected(
+                    locationName = place.name,
+                    latitude = place.latLng.latitude,
+                    longitude = place.latLng.longitude
+                )
+            },
+            onCancel = { habitViewModel.onShowMapChange(false) }
+        )
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Adicionar Novo Hábito") }
+                title = {
+                    Text(
+                        if(uiState.habitId == null)
+                            "Adicionar Novo Hábito"
+                        else
+                            "Editar Hábito"
+                    )
+                }
             )
         }
     ) { paddingValues ->
@@ -72,69 +75,59 @@ fun AddHabitScreen(
 
             // Nome do hábito
             OutlinedTextField(
-                value = name,
+                value = uiState.name,
                 onValueChange = {
-                    name = it
-                    isNameError = it.isBlank()
+                    habitViewModel.onNameChange(it)
                 },
                 label = { Text("Nome do Hábito") },
-                isError = isNameError,
+                isError = uiState.isNameError,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (isNameError) {
+            if (uiState.isNameError) {
                 Text(
                     text = "Nome do hábito é obrigatório",
                     color = MaterialTheme.colorScheme.error
                 )
             }
 
-            // Descrição (opcional)
+            // Descrição
             OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = uiState.description,
+                onValueChange = {
+                    habitViewModel.onDescriptionChange(it)
+                },
                 label = { Text("Descrição") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             // Localização (clicável)
             OutlinedTextField(
-                value = locationName ?: "Nenhum local selecionado",
+                value = uiState.locationName ?: "Nenhum local selecionado",
                 onValueChange = {},
                 label = { Text("Local do Hábito") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showMapScreen = true },
+                    .clickable { habitViewModel.onShowMapChange(true) },
                 enabled = false,
                 leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) }
             )
 
-            // Botão salvar
+            // Botão salvar / atualizar
             Button(
                 onClick = {
-                    if (name.isBlank()) {
-                        isNameError = true
-                    } else {
-                        val currentUserId = 1L // substituir pelo ID do usuário logado
-                        viewModel.addHabit(
-                            name = name,
-                            userId = currentUserId,
-                            description = description,
-                            latitude = latitude,
-                            longitude = longitude,
-                            locationName = locationName
-                        )
-                        // Resetar campos ou navegar de volta
-                        name = ""
-                        description = ""
-                        locationName = null
-                        latitude = null
-                        longitude = null
+                    habitViewModel.submitHabit {
                         onNavigateBack()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Salvar Hábito")
+                Text(
+                    if(uiState.habitId == null){
+                        "Salvar Hábito"
+                    } else{
+                        "Atualizar Hábito"
+                    }
+                )
             }
         }
     }

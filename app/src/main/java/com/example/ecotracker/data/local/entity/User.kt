@@ -15,10 +15,8 @@ data class User(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val name: String,
-    val dataNascimento: String,
     val email: String,
     val bio: String,
     val passwordHash: String,
-    val logged: Boolean,
     val createdAt: Long = System.currentTimeMillis()
 )

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import com.example.ecotracker.data.datastore.UserPreferences
 import com.example.ecotracker.data.datastore.UserSession
+import kotlinx.coroutines.flow.firstOrNull
 
 sealed class UserError(message: String) : Exception(message) {
     object DatabaseError : UserError("Erro no banco de Dados")
@@ -42,31 +43,45 @@ class UserRepository(
             Result.failure(UserError.DatabaseError)
         }
     }
-    suspend fun logOutUser(): Result<Unit> {
+
+    suspend fun deleteUser(userId: Long): Result<Unit> {
         return try {
-            val row = userDao.logOut()
-            // Valor diferente de 0 sucesso na operação, caso contrário erro
-            if(row == 0) {
+            val rows = userDao.deleteUserByID(userId)
+
+            if (rows == 0) {
                 Result.failure(UserError.UserNotFound)
+            } else {
+                // Se o usuário deletado for o que está logado, limpa a sessão
+                val loggedUser = userPreferences.userFlow.firstOrNull()
+
+                if (loggedUser?.id == userId) {
+                    userPreferences.clearUser()
+                }
+
+                Result.success(Unit)
             }
-            else Result.success(Unit)
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             Result.failure(UserError.DatabaseError)
         }
     }
+
     // Retorna o usuário logado (ou null)
     fun getLoggedUserPreference(): Flow<UserSession?> = userPreferences.userFlow
-    suspend fun saveUser(user: UserSession) = userPreferences.saveUser(user.id, user.name, user.email)
-    suspend fun clearUser() = userPreferences.clearUser()
+
+    suspend fun saveLoggedUser(user: UserSession){
+        userPreferences.saveUser(user.id, user.name, user.email)
+    }
+
+    suspend fun logout(): Result<Unit> {
+        return try {
+            userPreferences.clearUser()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(UserError.DatabaseError)
+        }
+    }
 
     // Querys
-    fun getLoggedUser(): Flow<User?> {
-        return userDao.getLoggedUser()
-            .catch { exception ->
-                emit(null)
-            }
-    }
 
     fun getUserByName(username: String): Flow<PagingData<User>> {
         return Pager(
@@ -75,6 +90,9 @@ class UserRepository(
                 userDao.getUserByName(username)
             }
         ).flow
+    }
+    fun getUserById(userId: Long): Flow<User?> {
+        return userDao.getUserById(userId)
     }
 
     fun getUserByEmail(email: String): Flow<User?> {

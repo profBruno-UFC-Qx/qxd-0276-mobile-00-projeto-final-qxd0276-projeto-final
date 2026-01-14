@@ -47,7 +47,6 @@ fun EditProfileScreen(
         user?.let {
             name = it.name
             email = it.email
-            birth = it.dataNascimento
             bio = it.bio
         }
     }
@@ -81,13 +80,6 @@ fun EditProfileScreen(
             )
 
             OutlinedTextField(
-                value = birth,
-                onValueChange = { birth = it },
-                label = { Text("Data de nascimento") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
                 value = bio,
                 onValueChange = { bio = it },
                 label = { Text("Bio") },
@@ -109,7 +101,6 @@ fun EditProfileScreen(
                     viewModel.updateUser(
                         name = name,
                         email = email,
-                        dataNascimento = birth,
                         bio = bio,
                         password = password.takeIf { it.isNotBlank() }
                     )

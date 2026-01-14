@@ -16,7 +16,8 @@ object HabitViewModelFactory : ViewModelProvider.Factory {
                     as EcoTrackerApplication
 
         return HabitViewModel(
-            repository = application.container.habitRepository
+            repository = application.container.habitRepository,
+            userPreferences = application.container.userPreferences
         ) as T
     }
 }

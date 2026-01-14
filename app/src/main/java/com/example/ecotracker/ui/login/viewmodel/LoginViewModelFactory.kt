@@ -23,8 +23,7 @@ object LoginViewModelFactory : ViewModelProvider.Factory {
                     as EcoTrackerApplication
 
         return LoginViewModel(
-            userRepository = application.container.userRepository,
-            userPreferences = application.container.userPreferences
+            userRepository = application.container.userRepository
         ) as T
     }
 }

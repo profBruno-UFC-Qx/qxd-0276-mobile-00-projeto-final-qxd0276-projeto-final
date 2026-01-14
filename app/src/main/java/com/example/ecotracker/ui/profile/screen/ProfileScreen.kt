@@ -1,3 +1,6 @@
+package com.example.ecotracker.ui.profile.screen
+
+import ProfileViewModelFactory
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,10 +34,6 @@ fun ProfileScreen(
 ) {
     val user by viewModel.user.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadUser()
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Perfil") })
@@ -50,7 +49,7 @@ fun ProfileScreen(
 
             ProfileHeader(
                 name = user?.name ?: "",
-                level = 3,        // depois vem da lógica
+                level = 3,
                 points = 180
             )
 
@@ -61,7 +60,6 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ProfileInfoRow("Email", user?.email ?: "")
-            ProfileInfoRow("Nascimento", user?.dataNascimento ?: "")
             ProfileInfoRow("Membro desde", viewModel.formatDate(user?.createdAt))
 
             Spacer(modifier = Modifier.height(32.dp))

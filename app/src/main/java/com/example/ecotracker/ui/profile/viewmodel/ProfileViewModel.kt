@@ -1,13 +1,16 @@
 package com.example.ecotracker.ui.profile.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ecotracker.data.datastore.UserPreferences
 import com.example.ecotracker.data.local.entity.User
 import com.example.ecotracker.data.repository.UserRepository
 import com.example.ecotracker.utils.hashPassword
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,17 +25,24 @@ class ProfileViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    init {
+        loadUser()
+    }
     fun loadUser() {
         viewModelScope.launch {
-            userRepository.getLoggedUser().collectLatest { loggedUser ->
-                _user.value = loggedUser
-            }
+            userRepository.getLoggedUserPreference()
+                .filterNotNull()
+                .collectLatest { session ->
+                    userRepository.getUserById(session.id)
+                        .collectLatest { fullUser ->
+                            _user.value = fullUser
+                        }
+                }
         }
     }
     fun updateUser(
         name: String,
         email: String,
-        dataNascimento: String,
         bio: String,
         password: String? = null
     ) {
@@ -42,7 +52,6 @@ class ProfileViewModel(
             val updatedUser = currentUser.copy(
                 name = name,
                 email = email,
-                dataNascimento = dataNascimento,
                 bio = bio,
                 passwordHash = password?.let { hashPassword(it) } ?: currentUser.passwordHash
             )
@@ -53,7 +62,7 @@ class ProfileViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            userRepository.logOutUser()
+            userRepository.logout()
         }
     }
 

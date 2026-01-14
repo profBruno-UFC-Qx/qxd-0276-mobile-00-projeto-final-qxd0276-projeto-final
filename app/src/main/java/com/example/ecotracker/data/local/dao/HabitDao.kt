@@ -33,24 +33,35 @@ interface HabitDao {
 
     // Buscar Hábito por ID
     @Query("SELECT * FROM habit WHERE id = :habitId LIMIT 1")
-    fun getHabitById(habitId: Long): Flow<Habit?>
+    suspend fun getHabitById(habitId: Long): Habit?
 
     @Query("SELECT * FROM habit WHERE userId = :userId ORDER BY createdAt DESC")
     fun getHabitsByUser(userId: Long): PagingSource<Int, Habit>
 
     // Lista hábitos Feitos
-    @Query("SELECT * FROM habit WHERE isCompleted = 1")
-    fun getCompletedHabits(): PagingSource<Int, Habit>
+    @Query(""" SELECT h.*
+        FROM habit h
+        INNER JOIN habit_completions hc
+            ON h.id = hc.habitId
+        WHERE h.userId = :userId
+          AND hc.date = :date
+    """)
+    fun getCompletedHabits(userId: Long, date: String): PagingSource<Int, Habit>
 
     // Lista Hábitos Pendentes
-    @Query("SELECT * FROM habit WHERE isCompleted = 0")
-    fun getPendingHabits(): PagingSource<Int, Habit>
+    @Query("""
+    SELECT h.*
+    FROM habit h
+    WHERE h.userId = :userId
+      AND h.id NOT IN (
+          SELECT habitId
+          FROM habit_completions
+          WHERE date = :date
+      )
+""")
+    fun getPendingHabits(userId: Long, date: String): PagingSource<Int, Habit>
 
     // Contabiliza todos os hábitos
-    @Query("SELECT COUNT(*) FROM habit")
-    fun countHabits(): Flow<Int>
-
-    // Contabiliza os Hábitos completos
-    @Query("SELECT COUNT(*) FROM habit WHERE isCompleted = 1")
-    fun countCompletedHabits(): Flow<Int>
+    @Query("SELECT COUNT(*) FROM habit WHERE userId = :userId")
+    fun countHabits(userId: Long): Flow<Int>
 }

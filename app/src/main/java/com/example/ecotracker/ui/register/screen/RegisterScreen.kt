@@ -17,14 +17,8 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onGoToLogin: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var dataNascimento by remember { mutableStateOf("") }
-    var bio by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val loading by viewModel.loading.collectAsState()
-    val error by viewModel.error.collectAsState()
 
     Scaffold(
         topBar = {
@@ -40,39 +34,53 @@ fun RegisterScreen(
         ) {
 
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = uiState.name,
+                onValueChange = { viewModel.onNameChange(it) },
                 label = { Text("Nome") },
+                isError = uiState.isNameError,
                 modifier = Modifier.fillMaxWidth()
             )
+            if (uiState.isNameError) {
+                Text(
+                    text = "Nome é obrigatório",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = { viewModel.onEmailChange(it) },
                 label = { Text("Email") },
+                isError = uiState.isNameError,
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+            if (uiState.isEmailError) {
+                Text(
+                    text = "Email inválido",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text("Senha") },
                 visualTransformation = PasswordVisualTransformation(),
+                isError = uiState.isPasswordError,
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+            if (uiState.isPasswordError) {
+                Text(
+                    text = "Senha deve ter no mínimo 6 caracteres",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
-                value = dataNascimento,
-                onValueChange = { dataNascimento = it },
-                label = { Text("Data de nascimento") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = bio,
-                onValueChange = { bio = it },
+                value = uiState.bio,
+                onValueChange = { viewModel.onBioChange(it) },
                 label = { Text("Bio") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -80,23 +88,11 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {
-                    viewModel.register(
-                        name = name,
-                        email = email,
-                        password = password,
-                        birth = dataNascimento,
-                        bio = bio,
-                        onSuccess = onRegisterSuccess
-                    )
-                },
+                onClick = { viewModel.register(onSuccess = onRegisterSuccess) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !loading &&
-                        name.isNotBlank() &&
-                        email.isNotBlank() &&
-                        password.isNotBlank()
+                enabled = !uiState.loading
             ) {
-                Text(if (loading) "Criando conta..." else "Cadastrar")
+                Text(if (uiState.loading) "Criando conta..." else "Cadastrar")
             }
 
             TextButton(
@@ -104,14 +100,6 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Já tenho uma conta")
-            }
-
-            error?.let {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error
-                )
             }
         }
     }

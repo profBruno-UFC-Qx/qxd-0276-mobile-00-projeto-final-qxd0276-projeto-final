@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun MainScaffold() {
+fun MainScaffold(
+    rootNavController: NavController
+) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -19,7 +22,7 @@ fun MainScaffold() {
             navController = navController,
             modifier = Modifier.padding(padding),
             onLogout = {
-                navController.navigate(Routes.LOGIN) {
+                rootNavController.navigate(Routes.LOGIN) {
                     popUpTo(Routes.MAIN) { inclusive = true }
                 }
             }

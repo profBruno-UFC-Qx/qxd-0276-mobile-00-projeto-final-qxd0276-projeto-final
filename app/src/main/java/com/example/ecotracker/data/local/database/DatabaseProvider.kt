@@ -15,6 +15,8 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDataBase::class.java,
                 "eco_tracker_db"
-            ).build().also { INSTANCE = it }
+            ).fallbackToDestructiveMigration()
+                .build()
+                .also { INSTANCE = it }
         }
 }

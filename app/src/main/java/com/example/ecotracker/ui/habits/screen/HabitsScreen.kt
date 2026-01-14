@@ -33,6 +33,7 @@ import com.example.ecotracker.ui.habits.viewmodel.HabitViewModelFactory
 fun HabitsScreen(
     viewModel: HabitViewModel = viewModel(factory = HabitViewModelFactory),
     onNavigateToCreateHabit: () -> Unit,
+    onNavigateToEditHabit: (habitId: Long) -> Unit
 ) {
     // Coleta a lista de habitos do ViewModel
     val habits: LazyPagingItems<Habit> = viewModel.habits.collectAsLazyPagingItems()
@@ -47,6 +48,14 @@ fun HabitsScreen(
     // Efeito para exibir o Snackbar quando houver mudança de estado
     LaunchedEffect(operationUiState) {
         when (val state = operationUiState) {
+            is HabitOperationUiState.HabitAdded -> {
+                snackbarHostState.showSnackbar("Hábito criado com sucesso!")
+                viewModel.resetState()
+            }
+            is HabitOperationUiState.HabitUpdated -> {
+                snackbarHostState.showSnackbar("Hábito atualizado com sucesso!")
+                viewModel.resetState()
+            }
             is HabitOperationUiState.HabitDeleted -> {
                 snackbarHostState.showSnackbar("Hábito deletado com sucesso!")
                 viewModel.resetState()
@@ -75,23 +84,34 @@ fun HabitsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // 5. Cabeçalho com filtros
+            // Cabeçalho com filtros
             HeaderSection(viewModel = viewModel, currentFilter = currentFilter)
 
-            // 6. A LazyColumn para exibir a lista de hábitos
+            // LazyColumn que exibir a lista de hábitos
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                // 7. Renderiza cada hábito da lista
+                // Renderiza cada hábito da lista
                 items(
                     count = habits.itemCount,
                     key = { index -> habits.peek(index)?.id ?: index }
                 ) { index ->
                     val habit = habits[index]
                     if (habit != null) {
+                        val completed by viewModel
+                            .isHabitCompletedTodayFlow(habit.id)
+                            .collectAsState(initial = false)
+
                         HabitItem(
                             habit = habit,
+                            isCompleted = completed,
+                            onToggleComplete = {
+                                viewModel.toggleHabitCompletion(habit.id)
+                            },
+                            onEditClick = {
+                                onNavigateToEditHabit(habit.id)
+                            },
                             onDeleteClick = {
                                 viewModel.deleteHabitById(habit.id)
                             }
@@ -104,7 +124,7 @@ fun HabitsScreen(
                     }
                 }
 
-                // 8. Gerencia os estados de carregamento da paginação
+                // Gerencia os estados de carregamento da paginação
                 when {
                     // Carregamento inicial da tela inteira
                     habits.loadState.refresh is LoadState.Loading -> {
@@ -150,15 +170,16 @@ fun HabitsScreen(
 private fun HeaderSection(viewModel: HabitViewModel, currentFilter: HabitFilter) {
     val totalCount by viewModel.totalHabitsCount.collectAsState()
     val completedCount by viewModel.completedHabitsCount.collectAsState()
+    val pendingCount by viewModel.pendingHabitsCount.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
-        // Seção de Contadores
+        // Contadores
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             CounterPill("Totais: $totalCount")
-            CounterPill("Completos: $completedCount")
+            CounterPill("Concluídos: $completedCount")
         }
 
         Spacer(modifier = Modifier.height(16.dp))

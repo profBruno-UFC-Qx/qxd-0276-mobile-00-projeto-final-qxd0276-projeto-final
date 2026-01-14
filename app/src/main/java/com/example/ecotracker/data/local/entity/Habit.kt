@@ -26,7 +26,6 @@ data class Habit(
     val name: String,
     val description: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val isCompleted: Boolean = false,
     val latitude: Double? = null,
     val longitude: Double? = null,
     val locationName: String? = null

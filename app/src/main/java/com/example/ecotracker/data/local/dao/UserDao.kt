@@ -26,12 +26,9 @@ interface UserDao {
     @Query("DELETE FROM users WHERE id = :userId")
     suspend fun deleteUserByID(userId: Long): Int
 
-    @Query("DELETE FROM users")
-    suspend fun logOut(): Int
-
     // Querys
-    @Query("SELECT * FROM users")
-    fun getLoggedUser(): Flow<User?>
+    @Query("SELECT * FROM users WHERE id = :userId")
+    fun getUserById(userId: Long): Flow<User?>
 
     @Query("SELECT * FROM users WHERE LOWER(name) LIKE '%'|| LOWER(:name) || '%'")
     fun getUserByName(name: String): PagingSource<Int, User>

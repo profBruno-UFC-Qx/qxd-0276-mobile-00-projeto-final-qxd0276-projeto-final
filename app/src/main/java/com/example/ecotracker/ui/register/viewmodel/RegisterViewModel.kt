@@ -15,53 +15,83 @@ class RegisterViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
+    private val _uiState = MutableStateFlow(RegisterUiState())
+    val uiState: StateFlow<RegisterUiState> = _uiState
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    // Atualizações de campos
+    fun onNameChange(value: String) {
+        _uiState.value = _uiState.value.copy(name = value, isNameError = false)
+    }
 
-    fun register(
-        name: String,
-        email: String,
-        password: String,
-        birth: String,
-        bio: String,
-        onSuccess: () -> Unit
-    ) {
+    fun onEmailChange(value: String) {
+        _uiState.value = _uiState.value.copy(email = value, isEmailError = false)
+    }
+
+    fun onPasswordChange(value: String) {
+        _uiState.value = _uiState.value.copy(password = value, isPasswordError = false)
+    }
+
+    fun onBioChange(value: String) {
+        _uiState.value = _uiState.value.copy(bio = value, isBioError = false)
+    }
+
+    fun register(onSuccess: () -> Unit) {
+        val state = _uiState.value
+
+        // Validação básica
+        val passwordError = state.password.length < 6
+
+        var hasError = false
+        _uiState.value = state.copy(
+            isNameError = state.name.isBlank().also { if (it) hasError = true },
+            isEmailError = state.email.isBlank().also { if (it) hasError = true },
+            isPasswordError = passwordError,
+            isBioError = state.bio.isBlank().also { if (it) hasError = true },
+            generalError = null
+        )
+
+        if (hasError) return
+
         viewModelScope.launch {
-            _loading.value = true
-            _error.value = null
+            _uiState.value = _uiState.value.copy(loading = true, generalError = null)
 
             try {
-                val passwordHash = hashPassword(password)
+                val passwordHash = hashPassword(state.password)
 
                 val user = User(
-                    name = name,
-                    email = email,
+                    name = state.name,
+                    email = state.email,
                     passwordHash = passwordHash,
-                    dataNascimento = birth,
-                    bio = bio,
-                    logged = true // logado apos cadastro
+                    bio = state.bio
                 )
-                val existingUser = userRepository.getUserByEmail(email).first()
+                val existingUser = userRepository.getUserByEmail(state.email).first()
                 if(existingUser != null) {
-                    _error.value = "Email já cadastrado"
+                    _uiState.value = _uiState.value.copy(
+                        generalError = "Email já registrado",
+                        loading = false
+                    )
                     return@launch
                 }
                 val result = userRepository.registerUser(user)
-                Log.e("RegisterViewModel", "Resultado do registro: $result")
+                Log.d("RegisterViewModel", "Resultado do registro: $result")
+
                 if (result.isSuccess) {
                     onSuccess()
                 } else {
-                    _error.value = "Erro ao criar conta"
+                    _uiState.value = _uiState.value.copy(
+                        generalError = "Erro ao criar conta",
+                        loading = false
+                    )
                 }
-
             } catch (e: Exception) {
-                _error.value = "Erro inesperado ao criar conta"
-            } finally {
-                _loading.value = false
+                _uiState.value = _uiState.value.copy(
+                    generalError = "Erro inesperado ao criar conta",
+                    loading = false
+                )
             }
         }
+    }
+    fun resetForm() {
+        _uiState.value = RegisterUiState()
     }
 }

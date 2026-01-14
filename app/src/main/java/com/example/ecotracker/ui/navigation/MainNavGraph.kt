@@ -1,19 +1,22 @@
 package com.example.ecotracker.ui.navigation
 
-import ProfileScreen
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.ecotracker.ui.habits.viewmodel.HabitViewModel
 import com.example.ecotracker.ui.habits.viewmodel.HabitViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.ecotracker.ui.habits.screen.AddHabitScreen
 import com.example.ecotracker.ui.habits.screen.HabitsScreen
 import com.example.ecotracker.ui.home.screen.HomeScreen
 import com.example.ecotracker.ui.impact.screen.ImpactScreen
 import com.example.ecotracker.ui.profile.screen.EditProfileScreen
+import com.example.ecotracker.ui.profile.screen.ProfileScreen
 
 
 @Composable
@@ -44,6 +47,9 @@ fun MainNavGraph(
                 viewModel = habitViewModel,
                 onNavigateToCreateHabit = {
                     navController.navigate(Routes.ADD_HABIT)
+                } ,
+                onNavigateToEditHabit = { habitId ->
+                    navController.navigate(Routes.editHabit(habitId))
                 }
             )
         }
@@ -51,7 +57,27 @@ fun MainNavGraph(
         // Add hábito
         composable(Routes.ADD_HABIT) {
             AddHabitScreen(
-                viewModel = habitViewModel,
+                habitViewModel = habitViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        // EDIT Hábito
+        composable(
+            route = Routes.EDIT_HABIT,
+            arguments = listOf(
+                navArgument("habitId") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+
+            val habitId = backStackEntry.arguments?.getLong("habitId") ?: return@composable
+
+            AddHabitScreen(
+                habitId = habitId,
+                habitViewModel = habitViewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
