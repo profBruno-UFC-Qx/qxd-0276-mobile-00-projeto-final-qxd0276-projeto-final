@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import com.example.ecotracker.data.datastore.UserPreferences
 import com.example.ecotracker.data.datastore.UserSession
+import com.example.ecotracker.data.local.dao.UserPointsDao
+import com.example.ecotracker.data.local.entity.UserPoints
 import kotlinx.coroutines.flow.firstOrNull
 
 sealed class UserError(message: String) : Exception(message) {
@@ -18,12 +20,16 @@ sealed class UserError(message: String) : Exception(message) {
 
 class UserRepository(
     private val userDao: UserDao,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val userPointsDao: UserPointsDao
 ) {
     // Crud
     suspend fun registerUser(user: User): Result<Unit> {
         return try {
-            userDao.insertUser(user)
+            // adiciona o usuário na tabela de user e tabela de pontos
+            val userId = userDao.insertUser(user)
+            userPointsDao.insertPoint(UserPoints(userId))
+
             Result.success(Unit)
         }
         catch (e: Exception){

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.ecotracker.data.local.entity.Habit
 import com.example.ecotracker.data.local.entity.HabitCompletion
 import kotlinx.coroutines.flow.Flow
 
@@ -37,4 +38,17 @@ interface HabitCompletionDao {
         WHERE habitId = :habitId
     """)
     fun getCompletionCount(habitId: Long): Flow<Int>
+
+    @Query("""
+    SELECT h.*
+    FROM habit h
+    INNER JOIN habit_completions hc 
+        ON h.id = hc.habitId
+    WHERE h.userId = :userId
+        AND h.latitude IS NOT NULL
+        AND h.longitude IS NOT NULL
+""")
+    fun getCompletedHabitsWithLocationByUser(
+        userId: Long
+    ): Flow<List<Habit>>
 }

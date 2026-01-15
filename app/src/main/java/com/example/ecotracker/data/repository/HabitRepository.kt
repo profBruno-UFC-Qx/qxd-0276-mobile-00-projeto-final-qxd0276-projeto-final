@@ -6,8 +6,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.ecotracker.data.local.dao.HabitCompletionDao
 import com.example.ecotracker.data.local.dao.HabitDao
+import com.example.ecotracker.data.local.dao.UserPointsDao
 import com.example.ecotracker.data.local.entity.Habit
 import com.example.ecotracker.data.local.entity.HabitCompletion
+import com.example.ecotracker.data.local.entity.UserPoints
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -17,7 +19,8 @@ sealed class HabitError(message: String) : Exception(message) {
 }
 class HabitRepository(
     private val habitDao: HabitDao,
-    private val completionDao: HabitCompletionDao
+    private val completionDao: HabitCompletionDao,
+    private val userPointsDao: UserPointsDao
 ) {
     // Crud
     suspend fun insertHabit(habit: Habit): Result<Unit> {
@@ -73,6 +76,11 @@ class HabitRepository(
         return habitDao.getHabitById(habitId)
     }
 
+
+    suspend fun getCompletedHabitsWithLocationByUser(userId: Long, ): Flow<List<Habit>> {
+        return completionDao.getCompletedHabitsWithLocationByUser(userId)
+    }
+
     fun getCompletedHabits(userId: Long, date: String): Flow<PagingData<Habit>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -95,11 +103,10 @@ class HabitRepository(
         return completionDao.countCompletedToday(userId, date)
     }
 
-    suspend fun toggleHabitCompletion(habitId: Long, date: String) {
-        val isCompleted = completionDao.isHabitCompleted(habitId, date).first()
-
+    suspend fun toggleHabitCompletion(userId: Long, isCompleted:Boolean, habitId: Long, date: String) {
         if (isCompleted) {
             completionDao.removeCompletion(habitId, date)
+            userPointsDao.addPoints(userId, delta = -10)
         } else {
             completionDao.insertCompletion(
                 HabitCompletion(
@@ -107,6 +114,7 @@ class HabitRepository(
                     date = date
                 )
             )
+            userPointsDao.addPoints(userId, delta = +10)
         }
     }
 
@@ -114,11 +122,7 @@ class HabitRepository(
         return completionDao.isHabitCompleted(habitId, date)
     }
 
-    fun getCompletionCount(habitId: Long): Flow<Int> {
-        return completionDao.getCompletionCount(habitId)
+    fun getUserPoints(userId: Long): Flow<Int> {
+        return userPointsDao.getPointsByUser(userId)
     }
-    suspend fun removeCompletion(habitId: Long, date: String){
-        return completionDao.removeCompletion(habitId, date)
-    }
-
 }

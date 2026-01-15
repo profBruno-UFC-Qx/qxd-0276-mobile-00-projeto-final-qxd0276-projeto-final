@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserDao {
     // Crud User
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User): Long
 
     @Update
     suspend fun updateUser(user: User): Int

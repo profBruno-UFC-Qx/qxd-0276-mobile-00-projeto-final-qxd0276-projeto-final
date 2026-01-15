@@ -1,28 +1,66 @@
 package com.example.ecotracker.ui.impact.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import com.example.ecotracker.data.local.entity.HabitMapItem
+import com.example.ecotracker.data.repository.HabitRepository
+import com.example.ecotracker.data.repository.UserRepository
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-data class ImpactUiState(
-    val totalHabitsCompleted: Int = 0,
-    val estimatedCo2Saved: Double = 0.0,
-    val points: Int = 0
-)
+class ImpactViewModel(
+    private val habitRepository: HabitRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
-class ImpactViewModel : ViewModel() {
+    private val dateFormatter = DateTimeFormatter.ISO_DATE
+    private val today = LocalDate.now().format(dateFormatter)
 
-    private val _uiState = MutableStateFlow(ImpactUiState())
-    val uiState: StateFlow<ImpactUiState> = _uiState
+    private val userIdFlow = userRepository.getLoggedUserPreference()
+        .filterNotNull()
+        .map { it.id }
 
-    fun loadImpactData() {
-        // 🔹 Futuramente:
-        // - Buscar hábitos concluídos
-        // - Calcular impacto ambiental/social
-        _uiState.value = ImpactUiState(
-            totalHabitsCompleted = 42,
-            estimatedCo2Saved = 12.5,
-            points = 180
-        )
-    }
+    val uiState: StateFlow<ImpactUiState> =
+        userIdFlow
+            .flatMapLatest { userId ->
+                combine(
+                    habitRepository.countCompletedToday(userId, today),
+                    habitRepository.getCompletedHabitsWithLocationByUser(userId),
+                    habitRepository.getUserPoints(userId)
+                ) { totalCompleted, habits, points ->
+
+                    val habitsOnMap = habits.mapNotNull { habit ->
+                        val lat = habit.latitude
+                        val lng = habit.longitude
+
+                        if (lat != null && lng != null) {
+                            HabitMapItem(
+                                id = habit.id,
+                                name = habit.name,
+                                latLng = LatLng(lat, lng)
+                            )
+                        } else null
+                    }
+
+                    ImpactUiState(
+                        totalHabitsCompleted = totalCompleted,
+                        points = points,
+                        habitsLocations = habitsOnMap
+                    )
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = ImpactUiState()
+            )
 }

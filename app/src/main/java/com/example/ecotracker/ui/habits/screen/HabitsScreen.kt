@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -99,10 +100,8 @@ fun HabitsScreen(
                 ) { index ->
                     val habit = habits[index]
                     if (habit != null) {
-                        val completed by viewModel
-                            .isHabitCompletedTodayFlow(habit.id)
-                            .collectAsState(initial = false)
-
+                        val completedMap by viewModel.completedTodayMap.collectAsStateWithLifecycle()
+                        val completed = completedMap[habit.id] ?: false
                         HabitItem(
                             habit = habit,
                             isCompleted = completed,

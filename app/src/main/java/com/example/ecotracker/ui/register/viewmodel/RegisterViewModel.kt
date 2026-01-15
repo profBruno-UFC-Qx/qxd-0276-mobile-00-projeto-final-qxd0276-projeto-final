@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecotracker.data.local.entity.User
+import com.example.ecotracker.data.repository.HabitRepository
 import com.example.ecotracker.data.repository.UserRepository
 import com.example.ecotracker.utils.hashPassword
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -45,7 +46,7 @@ class RegisterViewModel(
         _uiState.value = state.copy(
             isNameError = state.name.isBlank().also { if (it) hasError = true },
             isEmailError = state.email.isBlank().also { if (it) hasError = true },
-            isPasswordError = passwordError,
+            isPasswordError = passwordError.also{if (it) hasError = true},
             isBioError = state.bio.isBlank().also { if (it) hasError = true },
             generalError = null
         )

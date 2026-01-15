@@ -2,7 +2,7 @@ package com.example.ecotracker.ui.impact.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,23 +11,36 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ecotracker.ui.impact.components.ImpactCard
 import com.example.ecotracker.ui.impact.viewmodel.ImpactViewModel
+import com.example.ecotracker.ui.impact.viewmodel.ImpactViewModelFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImpactScreen(
-    viewModel: ImpactViewModel = viewModel(),
+    viewModel: ImpactViewModel = viewModel(factory = ImpactViewModelFactory),
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val cameraPositionState = rememberCameraPositionState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadImpactData()
+    LaunchedEffect(uiState.habitsLocations){
+        val initial = uiState.habitsLocations
+            .firstOrNull() ?.latLng
+            ?: LatLng(-23.5505, -46.6333)
+        cameraPositionState.position = CameraPosition.fromLatLngZoom(initial, 15f)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Impacto Social") }
+                title = { Text("Impacto Social") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Voltar")
+                    }
+                }
             )
         }
     ) { padding ->
@@ -46,20 +59,14 @@ fun ImpactScreen(
             )
 
             ImpactCard(
-                title = "CO₂ Evitado",
-                value = "${uiState.estimatedCo2Saved} kg",
-                subtitle = "Estimativa de impacto ambiental"
-            )
-
-            ImpactCard(
                 title = "Pontuação",
-                value = "${uiState.points}",
+                value = uiState.points.toString(),
                 subtitle = "Pontos por impacto positivo"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🔹 Área reservada para mapa / GPS
+            // Área para mapa / GPS
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -69,20 +76,20 @@ fun ImpactScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Impacto baseado na sua localização")
-                    Text(
-                        "Em breve você verá projetos próximos",
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        uiState.habitsLocations.forEach{ habit ->
+                            Marker(
+                                state = MarkerState(habit.latLng),
+                                title = habit.name
+                            )
+                        }
+                    }
                 }
             }
         }

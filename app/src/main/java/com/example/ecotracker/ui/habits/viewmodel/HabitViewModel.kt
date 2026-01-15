@@ -40,6 +40,9 @@ class HabitViewModel(
     private val userIdFlow: Flow<Long?> =
         userPreferences.userFlow.map { it?.id }
 
+    private val _completedTodayMap = MutableStateFlow<Map<Long, Boolean>>(emptyMap())
+    val completedTodayMap: StateFlow<Map<Long, Boolean>> = _completedTodayMap
+
     // Armazena a contagem de hábitos
     val totalHabitsCount: StateFlow<Int> = userIdFlow
         .flatMapLatest { userId ->
@@ -211,7 +214,16 @@ class HabitViewModel(
 
     fun toggleHabitCompletion(habitId: Long) {
         viewModelScope.launch {
-            repository.toggleHabitCompletion(habitId, today)
+            val isCompleted = repository.isHabitCompleted(habitId, today).first()
+            val userId = userIdFlow.filterNotNull().first()
+
+            repository.toggleHabitCompletion(userId, isCompleted, habitId, today)
+
+            _completedTodayMap.update { current ->
+                current.toMutableMap().apply {
+                    this[habitId] = !isCompleted
+                }
+            }
         }
     }
     fun isHabitCompletedTodayFlow(habitId: Long): Flow<Boolean>{

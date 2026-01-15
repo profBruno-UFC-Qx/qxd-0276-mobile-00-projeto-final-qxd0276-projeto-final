@@ -14,9 +14,10 @@ class AppContainer(context: Context) {
     private val habitDao = database.habitDao()
     private val userDao = database.userDao()
     private val habitCompletionDao = database.habitCompletionDao()
+    private val userPointsDao = database.userPointsDao()
     // DataStore
     val userPreferences = UserPreferences(appContext)
 
-    val habitRepository = HabitRepository(habitDao, habitCompletionDao)
-    val userRepository = UserRepository(userDao, userPreferences)
+    val habitRepository = HabitRepository(habitDao, habitCompletionDao, userPointsDao)
+    val userRepository = UserRepository(userDao, userPreferences, userPointsDao)
 }
