@@ -14,11 +14,13 @@ import com.example.ecotracker.data.repository.UserRepository
 import com.example.ecotracker.ui.login.screen.LoginScreen
 import com.example.ecotracker.ui.register.screen.RegisterScreen
 import com.example.ecotracker.ui.start.screen.StartScreen
+import com.example.ecotracker.ui.theme.ThemeViewModel
 
 @Composable
 fun EcoTrackerNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    themeViewModel: ThemeViewModel
 ) {
     NavHost(
         navController = navController,
@@ -72,7 +74,8 @@ fun EcoTrackerNavGraph(
         // Área principal
         composable(Routes.MAIN) {
             MainScaffold(
-                rootNavController = navController
+                rootNavController = navController,
+                themeViewModel = themeViewModel
             )
         }
     }

@@ -121,8 +121,4 @@ class HabitRepository(
     fun isHabitCompleted(habitId: Long, date: String): Flow<Boolean> {
         return completionDao.isHabitCompleted(habitId, date)
     }
-
-    fun getUserPoints(userId: Long): Flow<Int> {
-        return userPointsDao.getPointsByUser(userId)
-    }
 }

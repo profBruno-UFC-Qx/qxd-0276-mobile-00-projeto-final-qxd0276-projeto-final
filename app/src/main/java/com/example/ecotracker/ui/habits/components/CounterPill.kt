@@ -13,8 +13,11 @@ import androidx.compose.ui.unit.dp
 internal fun CounterPill(text: String) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
-        Text(text = text, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+        Text(text = text,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }

@@ -8,12 +8,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ecotracker.ui.navigation.EcoTrackerBottomBar
 import com.example.ecotracker.ui.navigation.EcoTrackerNavGraph
 import com.example.ecotracker.ui.navigation.Routes
 import com.example.ecotracker.ui.theme.EcoTrackerTheme
+import com.example.ecotracker.ui.theme.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -21,15 +23,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            EcoTrackerTheme {
-                EcoTrackerApp()
+            val themeViewModel: ThemeViewModel = viewModel()
+            EcoTrackerTheme(
+                darkTheme = themeViewModel.isDarkTheme.value
+            ) {
+                EcoTrackerApp(themeViewModel)
             }
         }
     }
 }
 
 @Composable
-fun EcoTrackerApp() {
+fun EcoTrackerApp(
+    themeViewModel: ThemeViewModel
+) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -51,7 +58,8 @@ fun EcoTrackerApp() {
 
         EcoTrackerNavGraph(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            themeViewModel = themeViewModel
         )
     }
 }

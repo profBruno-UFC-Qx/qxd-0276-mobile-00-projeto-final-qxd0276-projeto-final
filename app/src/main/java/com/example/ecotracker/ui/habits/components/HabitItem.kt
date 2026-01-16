@@ -45,7 +45,7 @@ internal fun HabitItem(
             }
         }
         IconButton(onClick = onEditClick) {
-            Icon(Icons.Default.Edit, contentDescription = "Editar Hábito", tint = MaterialTheme.colorScheme.error)
+            Icon(Icons.Default.Edit, contentDescription = "Editar Hábito", tint = MaterialTheme.colorScheme.primary)
         }
         IconButton(onClick = onDeleteClick) {
             Icon(Icons.Default.Delete, contentDescription = "Deletar Hábito", tint = MaterialTheme.colorScheme.error)

@@ -108,5 +108,7 @@ class UserRepository(
             }
 
     }
-
+    fun getUserPoints(userId: Long): Flow<Int> {
+        return userPointsDao.getPointsByUser(userId)
+    }
 }

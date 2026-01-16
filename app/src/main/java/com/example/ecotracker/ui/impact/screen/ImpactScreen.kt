@@ -1,5 +1,6 @@
 package com.example.ecotracker.ui.impact.screen
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -7,11 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ecotracker.R
 import com.example.ecotracker.ui.impact.components.ImpactCard
 import com.example.ecotracker.ui.impact.viewmodel.ImpactViewModel
 import com.example.ecotracker.ui.impact.viewmodel.ImpactViewModelFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -29,7 +33,7 @@ fun ImpactScreen(
         val initial = uiState.habitsLocations
             .firstOrNull() ?.latLng
             ?: LatLng(-23.5505, -46.6333)
-        cameraPositionState.position = CameraPosition.fromLatLngZoom(initial, 15f)
+        cameraPositionState.position = CameraPosition.fromLatLngZoom(initial, 12f)
     }
 
     Scaffold(
@@ -40,7 +44,11 @@ fun ImpactScreen(
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Voltar")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         }
     ) { padding ->
@@ -70,7 +78,7 @@ fun ImpactScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.tertiary
                 )
             ) {
                 Column(
@@ -83,10 +91,16 @@ fun ImpactScreen(
                         modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState
                     ) {
+                        val context = LocalContext.current
                         uiState.habitsLocations.forEach{ habit ->
+
+                            val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.global_location)
+                            val icon = BitmapDescriptorFactory.fromBitmap(bitmap)
+
                             Marker(
                                 state = MarkerState(habit.latLng),
-                                title = habit.name
+                                title = habit.name,
+                                icon = icon
                             )
                         }
                     }

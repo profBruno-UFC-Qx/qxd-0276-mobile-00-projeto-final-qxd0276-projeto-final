@@ -1,20 +1,27 @@
 package com.example.ecotracker.ui.profile.screen
 
 import ProfileViewModelFactory
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,27 +36,26 @@ import com.example.ecotracker.ui.profile.components.ProfileHeader
 import com.example.ecotracker.ui.profile.components.ProfileInfoRow
 import com.example.ecotracker.ui.profile.components.ProfileOptionItem
 import com.example.ecotracker.ui.profile.viewmodel.ProfileViewModel
+import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.utils.calculateLevel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    themeViewModel: ThemeViewModel,
     viewModel: ProfileViewModel = viewModel(
         factory = ProfileViewModelFactory
     ),
     onLogout: ()->Unit,
     onNavigateToEditProfile: () -> Unit
 ) {
+    val isDarkTheme by themeViewModel.isDarkTheme
     val uiState by viewModel.uiState.collectAsState()
     val deleteState by viewModel.deleteState.collectAsState()
     val user = uiState.user
     val points = uiState.points
-    val level =
-        when{
-            points <= 50 -> 1
-            points <= 100 -> 2
-            points <= 200 -> 3
-            else -> 0
-        }
+    val level = calculateLevel(points)
+
     var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(deleteState) {
@@ -85,7 +91,21 @@ fun ProfileScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Perfil") })
+            TopAppBar(
+                title = { Text("Perfil") },
+                actions = {
+                    IconButton(onClick = { themeViewModel.toggleTheme() }) {
+                        Icon(
+                            imageVector = if (isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                            contentDescription = "Alternar tema"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         }
     ) { padding ->
 
@@ -99,12 +119,9 @@ fun ProfileScreen(
             ProfileHeader(
                 name = user?.name ?: "",
                 level = level,
-                points = points
+                points = points,
+                bio = user?.bio ?:""
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(user?.bio ?: "", style = MaterialTheme.typography.bodyMedium)
 
             Spacer(modifier = Modifier.height(16.dp))
 

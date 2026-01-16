@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ImpactViewModel(
     private val habitRepository: HabitRepository,
     private val userRepository: UserRepository
@@ -35,7 +36,7 @@ class ImpactViewModel(
                 combine(
                     habitRepository.countCompletedToday(userId, today),
                     habitRepository.getCompletedHabitsWithLocationByUser(userId),
-                    habitRepository.getUserPoints(userId)
+                    userRepository.getUserPoints(userId)
                 ) { totalCompleted, habits, points ->
 
                     val habitsOnMap = habits.mapNotNull { habit ->

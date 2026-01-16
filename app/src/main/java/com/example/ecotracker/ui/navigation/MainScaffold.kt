@@ -6,10 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.ecotracker.ui.theme.ThemeViewModel
 
 @Composable
 fun MainScaffold(
-    rootNavController: NavController
+    rootNavController: NavController,
+    themeViewModel: ThemeViewModel
 ) {
     val navController = rememberNavController()
 
@@ -21,6 +23,7 @@ fun MainScaffold(
         MainNavGraph(
             navController = navController,
             modifier = Modifier.padding(padding),
+            themeViewModel = themeViewModel,
             onLogout = {
                 rootNavController.navigate(Routes.LOGIN) {
                     popUpTo(Routes.MAIN) { inclusive = true }

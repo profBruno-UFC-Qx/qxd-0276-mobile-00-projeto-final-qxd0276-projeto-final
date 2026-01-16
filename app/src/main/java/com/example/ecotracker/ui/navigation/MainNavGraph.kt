@@ -17,13 +17,15 @@ import com.example.ecotracker.ui.home.screen.HomeScreen
 import com.example.ecotracker.ui.impact.screen.ImpactScreen
 import com.example.ecotracker.ui.profile.screen.EditProfileScreen
 import com.example.ecotracker.ui.profile.screen.ProfileScreen
+import com.example.ecotracker.ui.theme.ThemeViewModel
 
 
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
     onLogout: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    themeViewModel: ThemeViewModel
 ) {
 
     val habitViewModel: HabitViewModel = viewModel(
@@ -94,6 +96,7 @@ fun MainNavGraph(
         // Perfil
         composable(Routes.PROFILE) {
             ProfileScreen(
+                themeViewModel = themeViewModel,
                 onLogout = onLogout,
                 onNavigateToEditProfile = {
                     navController.navigate(Routes.EDIT_PROFILE)

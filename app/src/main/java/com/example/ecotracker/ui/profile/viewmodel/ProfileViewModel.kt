@@ -25,7 +25,6 @@ import java.util.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileViewModel(
     private val userRepository: UserRepository,
-    private val habitRepository: HabitRepository
 ) : ViewModel() {
 
     private val _deleteState = MutableStateFlow(false)
@@ -38,7 +37,7 @@ class ProfileViewModel(
             .flatMapLatest{ userId ->
                 combine(
                     userRepository.getUserById(userId),
-                    habitRepository.getUserPoints(userId)
+                    userRepository.getUserPoints(userId)
                 ){ user, points ->
                     ProfileUiState(
                         user = user,

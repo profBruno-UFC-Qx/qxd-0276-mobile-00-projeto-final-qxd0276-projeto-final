@@ -2,78 +2,113 @@ package com.example.ecotracker.ui.home.screen
 
 import com.example.ecotracker.ui.home.viewmodel.HomeViewModel
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ecotracker.R
+import com.example.ecotracker.ui.home.components.AnimatedTree
+import com.example.ecotracker.ui.home.components.MotivationalCard
+import com.example.ecotracker.ui.home.viewmodel.HomeViewModelFactory
+import com.example.ecotracker.utils.calculateProgress
+import com.google.maps.android.compose.Circle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     val animatedProgress by animateFloatAsState(
-        targetValue = uiState.progress,
-        label = "TreeProgress"
+        targetValue = calculateProgress(uiState.points) ,
+        label = "Progresso para o proximo nível"
     )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Árvore
-        Image(
-            painter = painterResource(
-                id = when {
-                    animatedProgress < 0.33f -> R.drawable.tree_stage_1
-                    animatedProgress < 0.66f -> R.drawable.tree_stage_2
-                    else -> R.drawable.tree_stage_3
-                }
-            ),
-            contentDescription = "Árvore de progresso",
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("EcoTracker")},
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .height(260.dp)
-        )
+                .fillMaxSize()
+                .padding(padding)
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary
+                )
+            ){
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text("Nível ${uiState.level}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text("${uiState.points} pontos",
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Progresso
-        LinearProgressIndicator(
-            progress = animatedProgress,
-            modifier = Modifier.fillMaxWidth()
-        )
+            // Árvore
+            AnimatedTree(
+                treeStage = uiState.treeStage,
+                imageSize = 230.dp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        // Frase motivacional
-        Text(
-            text = uiState.motivationalPhrase,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "Fonte: ZenQuotes.io",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        )
+            // Progresso
+            Text(text = "Progresso ", fontSize = 18.sp)
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Frase motivacional
+            if (uiState.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                MotivationalCard(uiState.motivationalPhrase)
+            }
+        }
     }
 }

@@ -1,18 +1,21 @@
 package com.example.ecotracker.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun EcoTrackerBottomBar(navController: NavHostController) {
@@ -27,7 +30,10 @@ fun EcoTrackerBottomBar(navController: NavHostController) {
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.tertiary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    ) {
         items.forEach { route ->
             NavigationBarItem(
                 selected = currentRoute == route,
@@ -49,7 +55,13 @@ fun EcoTrackerBottomBar(navController: NavHostController) {
                         contentDescription = route
                     )
                 },
-                label = { Text(route.uppercase()) }
+                label = { Text(route.uppercase()) },
+                colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedTextColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     }

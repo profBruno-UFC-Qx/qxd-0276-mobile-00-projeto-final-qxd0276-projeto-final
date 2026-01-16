@@ -10,12 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ProfileHeader(
     name: String,
     level: Int,
-    points: Int
+    points: Int,
+    bio: String
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -42,5 +44,13 @@ fun ProfileHeader(
             "Nível $level • $points pontos",
             style = MaterialTheme.typography.bodyMedium
         )
+        Spacer(modifier=Modifier.padding(8.dp))
+        Text(
+            bio,
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 14.sp
+        )
+        Spacer(modifier=Modifier.padding(12.dp))
+
     }
 }

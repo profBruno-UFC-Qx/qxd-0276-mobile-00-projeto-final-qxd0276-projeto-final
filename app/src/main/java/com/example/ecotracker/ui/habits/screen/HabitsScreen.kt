@@ -72,7 +72,12 @@ fun HabitsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            TopAppBar(title = { Text("Meus Hábitos") })
+            TopAppBar(title = { Text("Meus Hábitos") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreateHabit) {
