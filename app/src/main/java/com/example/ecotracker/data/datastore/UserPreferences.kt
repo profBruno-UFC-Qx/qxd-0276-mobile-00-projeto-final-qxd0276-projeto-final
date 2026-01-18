@@ -1,8 +1,8 @@
 package com.example.ecotracker.data.datastore
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.IOException
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -19,6 +19,8 @@ object UserPreferencesKeys {
     val USER_ID = longPreferencesKey("user_id")
     val USER_NAME = stringPreferencesKey("user_name")
     val USER_EMAIL = stringPreferencesKey("user_email")
+
+    val DARK_THEME = booleanPreferencesKey("dark_theme")
 }
 
 class UserPreferences(private val context: Context) {
@@ -50,6 +52,23 @@ class UserPreferences(private val context: Context) {
                 } else null
             }
 
+    val darkThemeFlow: Flow<Boolean> =
+        context.dataStore.data
+            .catch { exception ->
+                if(exception is IOException){
+                    emit(emptyPreferences())
+                }else{
+                    throw exception
+                }
+            }.map { prefs ->
+                prefs[UserPreferencesKeys.DARK_THEME]?: false
+            }
+
+    suspend fun saveTheme(isDarkTheme: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[UserPreferencesKeys.DARK_THEME] = isDarkTheme
+        }
+    }
     suspend fun clearUser() {
         context.dataStore.edit { it.clear() }
     }

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,7 +16,8 @@ import com.example.ecotracker.ui.navigation.EcoTrackerBottomBar
 import com.example.ecotracker.ui.navigation.EcoTrackerNavGraph
 import com.example.ecotracker.ui.navigation.Routes
 import com.example.ecotracker.ui.theme.EcoTrackerTheme
-import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -23,9 +25,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val themeViewModel: ThemeViewModel = viewModel()
+            val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModelFactory)
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
             EcoTrackerTheme(
-                darkTheme = themeViewModel.isDarkTheme.value
+                darkTheme = isDarkTheme
             ) {
                 EcoTrackerApp(themeViewModel)
             }

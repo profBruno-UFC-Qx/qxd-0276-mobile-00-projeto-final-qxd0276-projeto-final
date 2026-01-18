@@ -1,14 +1,16 @@
 package com.example.ecotracker.ui.login.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ecotracker.di.AppContainer
 import com.example.ecotracker.ui.login.viewmodel.LoginViewModel
 import com.example.ecotracker.ui.login.viewmodel.LoginViewModelFactory
 
@@ -27,14 +29,17 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .imePadding()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Text(
             text = "EcoTracker",
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineLarge,
+            fontSize = 54.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -65,7 +70,10 @@ fun LoginScreen(
         Button(
             onClick = { viewModel.login(onLoginSuccess) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !loading && email.isNotBlank() && password.isNotBlank()
+            enabled = !loading && email.isNotBlank() && password.isNotBlank(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
         ) {
             if (loading) {
                 CircularProgressIndicator(
@@ -82,7 +90,10 @@ fun LoginScreen(
         TextButton(
             onClick = onRegisterNewUser,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !loading
+            enabled = !loading,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            )
         ) {
             Text("Não tem conta? Cadastre-se")
         }

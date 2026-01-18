@@ -36,7 +36,7 @@ import com.example.ecotracker.ui.profile.components.ProfileHeader
 import com.example.ecotracker.ui.profile.components.ProfileInfoRow
 import com.example.ecotracker.ui.profile.components.ProfileOptionItem
 import com.example.ecotracker.ui.profile.viewmodel.ProfileViewModel
-import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModel
 import com.example.ecotracker.utils.calculateLevel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +49,7 @@ fun ProfileScreen(
     onLogout: ()->Unit,
     onNavigateToEditProfile: () -> Unit
 ) {
-    val isDarkTheme by themeViewModel.isDarkTheme
+    val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val deleteState by viewModel.deleteState.collectAsState()
     val user = uiState.user
@@ -102,8 +102,10 @@ fun ProfileScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         }

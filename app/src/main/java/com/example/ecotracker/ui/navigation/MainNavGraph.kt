@@ -17,7 +17,7 @@ import com.example.ecotracker.ui.home.screen.HomeScreen
 import com.example.ecotracker.ui.impact.screen.ImpactScreen
 import com.example.ecotracker.ui.profile.screen.EditProfileScreen
 import com.example.ecotracker.ui.profile.screen.ProfileScreen
-import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModel
 
 
 @Composable

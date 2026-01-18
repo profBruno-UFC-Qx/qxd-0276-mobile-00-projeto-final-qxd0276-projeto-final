@@ -1,44 +1,57 @@
 package com.example.ecotracker.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
 // Light Theme
 val LightColorScheme = lightColorScheme(
-    primary = BluePrimaryContainerDark,
+    primary = MainLightText,
     onPrimary = Color.White,
-    tertiary = Teal,
-    primaryContainer = GreenLight,
-    onPrimaryContainer = GreenDark,
-    secondaryContainer = BluePrimaryContainer,
-    onSecondaryContainer = BluePrimary,
-    background = Color(0xFFFFFFFF),
-    surface = Color(0xFFF5F5F5),
-    onSurface = Color.Black
+
+    secondary = HighlightedLightText,
+    onSecondary = Color.White,
+
+    tertiary = DetailLightText,
+    onTertiary = HighlightedLightText,
+
+    background = LigthBackground,
+    onBackground = HighlightedLightText,
+
+    surface = SuperficialGreen,
+    onSurface = HighlightedLightText,
+
+    surfaceVariant = SuperficialGreen.copy(alpha = 0.85f),
+    onSurfaceVariant = HighlightedLightText,
+
+    primaryContainer = SuperficialGreen,
+    onPrimaryContainer = HighlightedLightText
 )
 
 // Dark Theme
 val DarkColorScheme = darkColorScheme(
-    primary = GreenLight,
-    secondary = GreenDark,
-    tertiary = BluePrimaryContainerDark,
-    primaryContainer = BluePrimaryContainerDark,
-    onPrimaryContainer = Color.White,
-    onSecondary = Color.White,
-    secondaryContainer = BluePrimaryContainerDark,
-    onSecondaryContainer = Teal,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color.White,
-    onSurface = Color.Black
+    primary = HighlightedText,
+    onPrimary = Color.Black,
+
+    secondary = DetailText,
+    onSecondary = Color.Black,
+
+    tertiary = MainText,
+    onTertiary = Color.Black,
+
+    background = BlueBackground,
+    onBackground = MainText,
+
+    surface = SuperficialBlue,
+    onSurface = MainText,
+
+    surfaceVariant = SuperficialBlue.copy(alpha = 0.85f),
+    onSurfaceVariant = MainText,
+
+    primaryContainer = SuperficialBlue,
+    onPrimaryContainer = MainText
 )
 
 

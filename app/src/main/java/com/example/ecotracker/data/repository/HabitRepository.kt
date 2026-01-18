@@ -102,6 +102,9 @@ class HabitRepository(
     fun countCompletedToday(userId: Long, date: String): Flow<Int> {
         return completionDao.countCompletedToday(userId, date)
     }
+    fun countAllCompletedHabits(userId: Long): Flow<Int> {
+        return completionDao.countAllCompletedHabits(userId)
+    }
 
     suspend fun toggleHabitCompletion(userId: Long, isCompleted:Boolean, habitId: Long, date: String) {
         if (isCompleted) {

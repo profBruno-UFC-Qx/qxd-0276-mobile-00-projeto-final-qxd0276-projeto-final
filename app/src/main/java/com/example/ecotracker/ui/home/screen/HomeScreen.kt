@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,8 +41,8 @@ fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = { Text("EcoTracker")},
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
                 )
             )
         }
@@ -58,7 +59,8 @@ fun HomeScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ){
                 Column(
@@ -69,11 +71,8 @@ fun HomeScreen(
                     Text("Nível ${uiState.level}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
                     )
-                    Text("${uiState.points} pontos",
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    Text("${uiState.points} pontos")
                 }
             }
 
@@ -91,14 +90,14 @@ fun HomeScreen(
             // Progresso
             Text(text = "Progresso ", fontSize = 18.sp)
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier.fillMaxWidth().padding(20.dp),
-                color = ProgressIndicatorDefaults.linearColor,
-                trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                strokeCap = StrokeCap.Round,
             )
 
             Spacer(modifier = Modifier.weight(1f))

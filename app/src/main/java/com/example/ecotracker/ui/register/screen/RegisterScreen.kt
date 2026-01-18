@@ -1,11 +1,16 @@
 package com.example.ecotracker.ui.register.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ecotracker.ui.register.viewmodel.RegisterViewModel
 import com.example.ecotracker.ui.register.viewmodel.RegisterViewModelFactory
@@ -28,10 +33,20 @@ fun RegisterScreen(
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.dp)
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Text(
+                text = "Insira seus dados",
+                style = MaterialTheme.typography.headlineLarge,
+                fontSize = 24.sp
+            )
 
             OutlinedTextField(
                 value = uiState.name,

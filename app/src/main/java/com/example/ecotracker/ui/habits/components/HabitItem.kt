@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,12 +37,23 @@ internal fun HabitItem(
     ) {
         Checkbox(
             checked = isCompleted,
-            onCheckedChange = { onToggleComplete() }
+            onCheckedChange = { onToggleComplete() },
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = habit.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = habit.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             if (habit.description.isNotBlank()) {
-                Text(text = habit.description, style = MaterialTheme.typography.bodyMedium)
+                Text(text = habit.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         IconButton(onClick = onEditClick) {

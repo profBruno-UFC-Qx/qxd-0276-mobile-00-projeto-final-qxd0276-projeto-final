@@ -34,7 +34,7 @@ class ImpactViewModel(
         userIdFlow
             .flatMapLatest { userId ->
                 combine(
-                    habitRepository.countCompletedToday(userId, today),
+                    habitRepository.countAllCompletedHabits(userId),
                     habitRepository.getCompletedHabitsWithLocationByUser(userId),
                     userRepository.getUserPoints(userId)
                 ) { totalCompleted, habits, points ->

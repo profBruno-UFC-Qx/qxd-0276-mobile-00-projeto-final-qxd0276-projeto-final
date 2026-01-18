@@ -14,7 +14,7 @@ import com.example.ecotracker.data.repository.UserRepository
 import com.example.ecotracker.ui.login.screen.LoginScreen
 import com.example.ecotracker.ui.register.screen.RegisterScreen
 import com.example.ecotracker.ui.start.screen.StartScreen
-import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModel
 
 @Composable
 fun EcoTrackerNavGraph(

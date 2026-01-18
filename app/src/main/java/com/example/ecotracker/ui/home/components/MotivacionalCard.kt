@@ -25,7 +25,8 @@ fun MotivationalCard(pharse: String){
         modifier = Modifier.fillMaxWidth()
             .heightIn(min = 120.dp, max = 180.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiary
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ){
@@ -38,15 +39,13 @@ fun MotivationalCard(pharse: String){
                 text = pharse,
                 fontSize = 18.sp,
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
+                textAlign = TextAlign.Center
             )
             Text(
                 text = "Fonte: ZenQuotes.io",
                 fontSize = 14.sp,
                 style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
+                textAlign = TextAlign.Center
             )
         }
     }

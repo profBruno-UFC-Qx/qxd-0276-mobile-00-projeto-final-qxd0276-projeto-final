@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.ecotracker.ui.theme.ThemeViewModel
+import com.example.ecotracker.ui.theme.viewmodel.ThemeViewModel
 
 @Composable
 fun MainScaffold(

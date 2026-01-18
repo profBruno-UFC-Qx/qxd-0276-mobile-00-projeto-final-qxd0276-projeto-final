@@ -31,8 +31,7 @@ fun EcoTrackerBottomBar(navController: NavHostController) {
         navController.currentBackStackEntryAsState().value?.destination?.route
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.tertiary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         items.forEach { route ->
             NavigationBarItem(
@@ -57,10 +56,11 @@ fun EcoTrackerBottomBar(navController: NavHostController) {
                 },
                 label = { Text(route.uppercase()) },
                 colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        unselectedIconColor = MaterialTheme.colorScheme.primary,
-                        selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        unselectedTextColor = MaterialTheme.colorScheme.primary
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
         }

@@ -34,6 +34,14 @@ interface HabitCompletionDao {
     fun countCompletedToday(userId: Long, date: String): Flow<Int>
 
     @Query("""
+        SELECT COUNT(DISTINCT hc.habitId)
+        FROM habit_completions AS hc
+        INNER JOIN habit AS h ON hc.habitId = h.id
+        WHERE h.userId = :userId
+    """)
+    fun countAllCompletedHabits(userId: Long): Flow<Int>
+
+    @Query("""
         SELECT COUNT(*) FROM habit_completions
         WHERE habitId = :habitId
     """)
