@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import com.example.bookkeeper.model.Book
 import com.example.bookkeeper.ui.theme.components.SaveSessionDialog
 import com.example.bookkeeper.viewmodel.BookViewModel
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +65,7 @@ fun ReadingSessionScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(books.filter { it.status == "Lendo" || it.status == "Quero Ler" }) { book ->
+                        items(items = books.filter { it.status == "Lendo" || it.status == "Quero Ler" }) { book ->
                             BookSelectionCard(book) { viewModel.setActiveBookForSession(book) }
                         }
                     }

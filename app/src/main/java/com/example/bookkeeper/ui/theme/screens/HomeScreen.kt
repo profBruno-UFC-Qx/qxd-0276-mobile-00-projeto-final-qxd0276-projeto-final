@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bookkeeper.model.Book
 import com.example.bookkeeper.viewmodel.BookViewModel
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +138,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    items(books) { book ->
+                    items(items=books) { book ->
                         BookItem(book = book, onClick = { onBookClick(book) })
                     }
                 }
